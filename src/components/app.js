@@ -12,7 +12,15 @@ import WritePost from "./pages/writePost";
 import PostDetail from "./pages/postDetail";
 import NoMatch from "./pages/noMatch";
 
+import Icons from "../helpers/icons";
+
 export default class App extends Component {
+  constructor(props) {
+    super(props);
+
+    Icons();
+  }
+
   render() {
     return (
       <div className='app'>
