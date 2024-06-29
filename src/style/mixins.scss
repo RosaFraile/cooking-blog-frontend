@@ -1,0 +1,16 @@
+@mixin read-more-btn {
+    width: max-content;
+    padding: 5px 10px;
+    border: 1px solid $teal;
+    cursor: pointer;
+    background-color: white;
+    color: teal;
+    border-radius: 6px;
+
+    &:hover {
+        border: 1px solid white;
+        background-color: $teal;
+        color: white;
+        border-radius: 6px;
+    }
+}

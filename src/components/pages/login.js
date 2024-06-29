@@ -29,7 +29,7 @@ export default class Login extends Component {
   render() {
     return (
       <div className='auth'>
-        <div className='close-window'><Link to="/"><FontAwesomeIcon icon="xmark" /></Link></div>
+        <Link to="/"><FontAwesomeIcon className='close-window' icon="xmark" /></Link>
         <h1>Login to access your posts</h1>
         <form onSubmit={this.handleSubmit}>
           <input required 

@@ -1,0 +1,38 @@
+.tricks {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .trick {
+        h1 {
+            font-size: 30px;
+            line-height: 38px;
+            letter-spacing: 0px;
+            color: $charcoal;
+        }
+
+        p {
+            font-size: 14px;
+            line-height: 24px;
+            letter-spacing: 0px;
+
+            .read-more {
+                @include read-more-btn();
+                margin-left: 5px;
+            }
+        }
+
+        @media screen and (max-width: 700px) {
+            h1 {
+                font-size: 20px;
+                line-height: 28px;
+            }
+
+            p {
+                font-size: 12px;
+                line-height: 22px;
+                letter-spacing: 0px;
+            }
+        }
+    }
+}

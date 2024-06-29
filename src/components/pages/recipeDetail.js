@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 
-export default class WritePost extends Component {
+export default class RecipeDetail extends Component {
   render() {
     return (
       <div>
-        WritePost
+        RecipeDetail
       </div>
     );
   }

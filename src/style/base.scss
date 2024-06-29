@@ -17,3 +17,13 @@ h6 {
     text-decoration: none;
     color: inherit;
 }
+.app {
+    display: flex;
+    justify-content: center;
+
+    .container {
+        width: 80vw;
+        display: flex;
+        justify-content: center;
+    }
+}
