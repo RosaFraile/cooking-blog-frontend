@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+import Navbar from '../navigation/navbar';
 import RecipeItem from '../recipes/recipeItem';
 
 export default class Home extends Component {
@@ -50,13 +51,18 @@ export default class Home extends Component {
 
   render() {
     return (
-      <div className='home'>
-        <div className='recipes'>
-          {this.state.recipes.map(recipe => (
-            <RecipeItem recipeItem={recipe} key={recipe.recipes_id} />
-          ))}
+      <div className='home-container'>
+        <Navbar />
+        <div className='home-wrapper'>
+          <div className='home'>
+            <div className='recipes'>
+              {this.state.recipes.map(recipe => (
+                <RecipeItem recipeItem={recipe} key={recipe.recipes_id} />
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      </div>  
     );
   }
 }

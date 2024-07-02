@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+import Navbar from '../navigation/navbar';
 import TrickItem from '../tricks/trickItem';
 
 export default class Tricks extends Component {
@@ -46,10 +47,15 @@ export default class Tricks extends Component {
 
   render() {
     return (
-      <div className='tricks'>
-        {this.state.tricks.map(trick => (
-          <TrickItem trickItem={trick} key={trick.tricks_id} />
-        ))}
+      <div className='tricks-container'>
+        <Navbar />
+        <div className='tricks-wrapper'>
+          <div className='tricks'>
+            {this.state.tricks.map(trick => (
+              <TrickItem trickItem={trick} key={trick.tricks_id} />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

@@ -14,3 +14,10 @@
         border-radius: 6px;
     }
 }
+
+@mixin base-brand {
+    font-size: 60px;
+    font-family: "Dancing Script", cursive;
+    font-weight: 700;
+    color: $charcoal;
+}

@@ -12,6 +12,7 @@ import WriteRecipe from "./pages/writeRecipe";
 import RecipeDetail from "./pages/recipeDetail";
 import Tricks from "./pages/tricks";
 import TrickDetail from "./pages/trickDetail";
+import About from "./pages/about"
 import NoMatch from "./pages/noMatch";
 
 import Icons from "../helpers/icons";
@@ -36,6 +37,7 @@ export default class App extends Component {
               <Route path="/recipe/:id" component={RecipeDetail}/>
               <Route path="/tricks" component={Tricks}/>
               <Route path="/trick/:id" component={TrickDetail}/>
+              <Route path="/about" component={About} />
               <Route component={NoMatch} />
             </Switch>
           </Router>

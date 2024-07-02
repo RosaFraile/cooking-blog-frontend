@@ -1,16 +1,12 @@
-body {
+* {
+    box-sizing: border-box;
     margin: 0;
-    font-family: "Poppins", sans-serif;
+    padding: 0;
 }
-
-p,
-h1, 
-h2, 
-h3, 
-h4, 
-h5, 
-h6 {
-    margin: 0;
+body {
+    min-height: 100vh;
+    width: 100%;
+    font-family: "Poppins", sans-serif;
 }
 
 .link {
@@ -20,9 +16,9 @@ h6 {
 .app {
     display: flex;
     justify-content: center;
+    width: 100vw;
 
     .container {
-        width: 80vw;
         display: flex;
         justify-content: center;
     }
