@@ -6,12 +6,16 @@
 body {
     min-height: 100vh;
     width: 100%;
-    font-family: "Poppins", sans-serif;
+    font-family: "Sofia Sans", sans-serif;
 }
 
 .link {
     text-decoration: none;
     color: inherit;
+}
+
+.cursive {
+    font-family: 'Dancing Script', cursive;
 }
 .app {
     display: flex;

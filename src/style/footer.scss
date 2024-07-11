@@ -1,0 +1,22 @@
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 30px;
+    width: 100vw;
+    background-color: $offwhite;
+    padding-top: 30px;
+    padding-bottom: 30px;
+
+    .image {
+        img {
+            height: 2rem;
+        }
+    }
+
+    .link {
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}

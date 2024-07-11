@@ -2,14 +2,22 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faXmark,
   faCirclePlus,
-  faBars
+  faBars,
+  faCircleMinus,
+  faPenToSquare,
+  faClock,
+  faCopyright
 } from "@fortawesome/free-solid-svg-icons";
 
 const Icons = () => {
     return library.add(
       faXmark,
       faCirclePlus,
-      faBars
+      faBars,
+      faCircleMinus,
+      faPenToSquare,
+      faClock,
+      faCopyright
     );
 };
 
