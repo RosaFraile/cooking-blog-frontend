@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 
 import Navbar from '../navigation/navbar';
+import Footer from '../footer/footer'
 import RecipeItem from '../recipes/recipeItem';
 
 export default class Home extends Component {
@@ -16,7 +17,6 @@ export default class Home extends Component {
   componentDidMount() {
     axios.get("http://localhost:5000/recipes")
       .then(response => {
-        console.log(response.data);
         this.setState({
           recipes: response.data
         })
@@ -38,6 +38,7 @@ export default class Home extends Component {
             </div>
           </div>
         </div>
+        <Footer />
       </div>  
     );
   }

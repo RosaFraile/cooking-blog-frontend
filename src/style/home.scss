@@ -8,6 +8,7 @@
         display: flex;
         justify-content: center;
         width: 100%;
+        margin-bottom: 30px;
         
         .home {
             width: 1000px;
@@ -63,6 +64,11 @@
                             line-height: 48px;
                             letter-spacing: 0px;
                             color: $charcoal;
+                        }
+
+                        .time-servings {
+                            display: flex;
+                            gap: 30px;
                         }
                     }
                 

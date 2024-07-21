@@ -19,4 +19,23 @@
             text-decoration: underline;
         }
     }
+
+    @media screen and (max-width: 700px) {
+        gap: 0;
+        justify-content: space-evenly;
+
+        .image {
+            img {
+                height: 1rem;
+            }
+        }
+
+        .link {
+            font-size: 0.75rem;
+        }
+
+        .auth-name {
+            font-size: 0.75rem;
+        }
+    }
 }

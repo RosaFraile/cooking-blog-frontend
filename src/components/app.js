@@ -8,7 +8,7 @@ import {
 import Home from "./pages/home";
 import Login from "./pages/login";
 import Register from "./pages/register";
-import WriteRecipe from "./pages/writeRecipe";
+import PostForm from "./posts/postForm";
 import RecipeDetail from "./pages/recipeDetail";
 import Tricks from "./pages/tricks";
 import TrickDetail from "./pages/trickDetail";
@@ -33,7 +33,7 @@ export default class App extends Component {
               <Route exact path="/" component={Home} />
               <Route path="/login" component={Login}/>
               <Route path="/register" component={Register} />
-              <Route path="/write" component={WriteRecipe} />
+              <Route path="/write" component={PostForm} />
               <Route path="/recipe/:id" component={RecipeDetail}/>
               <Route path="/tricks" component={Tricks}/>
               <Route path="/trick/:id" component={TrickDetail}/>

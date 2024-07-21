@@ -1,21 +1,25 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Link, withRouter } from 'react-router-dom';
+import axios from 'axios';
 
 import Logo from '../../../static/assets/images/cook-logo.png';
 import authImg from '../../../static/assets/images/auth-img.png';
+//import { response } from 'express';
+//import { response } from 'express';
 
-export default class Register extends Component {
-  constructor() {
-    super();
+class Register extends Component {
+  constructor(props) {
+    super(props);
 
     this.state = {
-      username: "",
-      email: "",
-      password: "",
+      users_username: "",
+      users_email: "",
+      users_password: "",
       errorText: ""
     }
+
     this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleChange(event) {
@@ -28,7 +32,20 @@ export default class Register extends Component {
     event.preventDefault();
     // TODO
     // Call to the API to register the user
-    console.log("handleSubmit", event);
+    axios.post("http://localhost:5000/auth/register", this.state, {
+      withCredentials: true
+    }).then(response => {
+      console.log(response);
+      if(response.data !== "User has been created.") {
+        this.setState({
+          errorText: response.data
+        })
+      } else {
+        this.props.history.push("/login");
+      }
+    }).catch(error => {
+      console.log("handleSubmit error", error);
+    })
   }
 
   render() {
@@ -51,17 +68,17 @@ export default class Register extends Component {
             <input required 
               type="text"
               placeholder="username"
-              name="username"
+              name="users_username"
               onChange={this.handleChange}/>
-              <input required 
+            <input required 
               type="text"
               placeholder="email"
-              name="email"
+              name="users_email"
               onChange={this.handleChange}/>
             <input required
               type="password"
               placeholder="password"
-              name="password"
+              name="users_password"
               onChange={this.handleChange}/>
             <button type="submit">Register</button>
           </form>
@@ -72,3 +89,5 @@ export default class Register extends Component {
     );
   }
 }
+
+export default withRouter(Register);

@@ -40,6 +40,32 @@
                 border-left: 2px solid $medium-grey;
                 padding-left: 15px;
             }
+
+            .edit-delete {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 1.2rem;
+                cursor: pointer;
+
+                .edit {
+                    color: $teal;
+                    transition: 0.15s ease-in-out;
+
+                    &:hover {
+                        color: $dark-teal;
+                    }
+                }
+
+                .delete {
+                    color: $warning;
+                    transition: 0.15s ease-in-out;
+
+                    &:hover {
+                        color: $charcoal;
+                    }
+                }
+            }
         }
 
         .image {
@@ -47,6 +73,19 @@
                 width: 100%;
                 height: 350px;
                 object-fit: cover;
+            }
+        }
+
+        .time-servings {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+
+            .prep-time,
+            .servings {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
             }
         }
 
