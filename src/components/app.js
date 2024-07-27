@@ -6,8 +6,8 @@ import {
 } from "react-router-dom";
 
 import Home from "./pages/home";
-import Login from "./pages/login";
 import Register from "./pages/register";
+import Login from "./pages/login";
 import PostForm from "./posts/postForm";
 import RecipeDetail from "./pages/recipeDetail";
 import Tricks from "./pages/tricks";
@@ -31,8 +31,8 @@ export default class App extends Component {
           <Router>
             <Switch>
               <Route exact path="/" component={Home} />
-              <Route path="/login" component={Login}/>
               <Route path="/register" component={Register} />
+              <Route path="/login" component={Login}/>
               <Route path="/write" component={PostForm} />
               <Route path="/recipe/:id" component={RecipeDetail}/>
               <Route path="/tricks" component={Tricks}/>

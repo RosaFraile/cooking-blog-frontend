@@ -7,7 +7,8 @@ import {
   faPenToSquare,
   faClock,
   faCopyright,
-  faTrash
+  faTrash,
+  faUser
 } from "@fortawesome/free-solid-svg-icons";
 
 const Icons = () => {
@@ -19,7 +20,8 @@ const Icons = () => {
       faPenToSquare,
       faClock,
       faCopyright,
-      faTrash
+      faTrash,
+      faUser
     );
 };
 

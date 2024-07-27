@@ -1,14 +1,18 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { connect } from 'react-redux';
+
+import * as actions from '../../actions';
 
 import Logo from '../../../static/assets/images/cook-logo.png';
 
-export default class Navbar extends Component {
+class Navbar extends Component {
     constructor() {
         super();
 
         this.handleHamburgerMenu = this.handleHamburgerMenu.bind(this);
+        this.handleLogout = this.handleLogout.bind(this);
     }
 
     componentDidMount() {
@@ -21,6 +25,11 @@ export default class Navbar extends Component {
 
     handleHamburgerMenu() {
         document.getElementById('links-list').classList.toggle('visible');
+    }
+
+    handleLogout() {
+        event.preventDefault();
+        this.props.logout();
     }
 
     render() {
@@ -38,12 +47,18 @@ export default class Navbar extends Component {
                         </div>
                     </div>
                     <div className='right-column'>
-                        <div>Rosa</div>
-                        <div className='logStatus'>Logout</div>
+                    <div><FontAwesomeIcon icon="user" /> {this.props.currentUser ?  this.props.currentUser.users_username : null}</div>
+                        {this.props.currentUser ? (<Link to="/" onClick={this.handleLogout} className='logStatus link'>Logout</Link>) : (<Link to="/login" className='logStatus link'>Login</Link>)}
                         <div>
-                            <Link className='write link' to="/write">
-                                <FontAwesomeIcon icon="circle-plus" />
-                            </Link>
+                            {this.props.currentUser ?
+                                (   <Link className='write link' to="/write">
+                                        <FontAwesomeIcon icon="circle-plus" />
+                                    </Link>
+                                ):(
+                                    null
+                                )
+                            }
+                            
                         </div>
                     </div>
                 </div>
@@ -74,3 +89,12 @@ export default class Navbar extends Component {
         );
     }
 }
+
+function mapStateToProps(state) {
+    console.log("From Navbar", state)
+    return {
+        currentUser: state.user.currentUser
+    }
+}
+
+export default connect(mapStateToProps, actions)(Navbar);

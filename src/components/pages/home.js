@@ -17,6 +17,7 @@ export default class Home extends Component {
   componentDidMount() {
     axios.get("http://localhost:5000/recipes")
       .then(response => {
+        console.log("Paso por aqui:", response.data)
         this.setState({
           recipes: response.data
         })
@@ -33,7 +34,7 @@ export default class Home extends Component {
           <div className='home'>
             <div className='recipes'>
               {this.state.recipes.map(recipe => (
-                <RecipeItem recipeItem={recipe} key={recipe.id} />
+                <RecipeItem recipeItem={recipe} key={recipe.recipes_id} />
               ))}
             </div>
           </div>

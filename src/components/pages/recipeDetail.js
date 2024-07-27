@@ -4,6 +4,9 @@ import moment from 'moment';
 import ReactHtmlParser from "react-html-parser";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+
+import * as actions from '../../actions';
 
 import Navbar from '../navigation/navbar';
 import Footer from '../footer/footer';
@@ -22,14 +25,14 @@ class RecipeDetail extends Component {
     }
     
     this.getRecipeItem = this.getRecipeItem.bind(this);
-    this.handleDelete = this.handleDelete.bind(this);
+    this.handleDeleteClick = this.handleDeleteClick.bind(this);
     this.handleEditClick = this.handleEditClick.bind(this);
     this.handleImageDelete = this.handleImageDelete.bind(this);
     this.handleUpdateFormSubmission = this.handleUpdateFormSubmission.bind(this);
   }
 
-  handleDelete() {
-    axios.delete(`http://localhost:5000/recipe/${this.state.currentId}`)
+  handleDeleteClick() {
+    axios.delete(`http://localhost:5000/recipes/${this.state.currentId}`)
     .then(response => {
       this.props.history.push("/");
     }).catch(error => {
@@ -59,9 +62,11 @@ class RecipeDetail extends Component {
   }
 
   getRecipeItem() {
+    console.log("Current ID", this.state.currentId)
     axios
-      .get(`http://localhost:5000/recipe/${this.state.currentId}`)
+      .get(`http://localhost:5000/recipes/${this.state.currentId}`)
       .then(response => {
+        console.log(response)
         this.setState({
           recipeItem: response.data,
           ingredients: response.data.ingredients,
@@ -73,6 +78,7 @@ class RecipeDetail extends Component {
   }
 
   componentDidMount() {
+    console.log("Paso por aqui componentDidMount")
     this.getRecipeItem();
   }
 
@@ -80,18 +86,19 @@ class RecipeDetail extends Component {
     const {
       title,
       desc,
-      username,
-      published_on,
-      img_url,
       prep_time,
       servings,
-      publish_status
+      img_url,
+      published_on,
+      users_username
     } = this.state.recipeItem;
 
     console.log(this.state.recipeItem)
-
+    
     const ingredients = this.state.ingredients;
     const steps = this.state.steps;
+    console.log(ingredients)
+    console.log(steps)
 
     const contentManager = () => {
       if (this.state.editMode) {
@@ -115,22 +122,29 @@ class RecipeDetail extends Component {
             </div>
             <div className='author-date'>
               <div className='author'>
-                <p>By <span>{username}</span></p>
+                <p>By <span>{users_username}</span></p>
               </div>
               <div className='date'>
                 <p>Published on {moment(published_on).format("MMMM DD, YYYY")}</p>
               </div>
-              <div className="edit-delete">
-                <div onClick={this.handleEditClick} className='edit'>
-                  <FontAwesomeIcon icon="edit" />
+              {
+                this.props.currentUser.users_username === users_username ?
+                (<div className="edit-delete">
+                  <div onClick={this.handleEditClick} className='edit'>
+                    <FontAwesomeIcon icon="edit" />
+                  </div>
+                  <div  onClick={this.handleDeleteClick} className='delete'>
+                    <FontAwesomeIcon icon="trash" />
+                  </div>
                 </div>
-                <div  onClick={this.handleDelete} className='delete'>
-                  <FontAwesomeIcon icon="trash" />
-                </div>
-              </div>
+                ):(
+                  null
+                )
+              }
             </div>
             <div className='image'>
-              <img src={img_url} alt="Featured image" />
+            
+              <img src={`http://localhost:5000/images/${img_url}`} alt="Featured image" />
             </div>
             <div className='time-servings'>
               <div className='prep-time'>
@@ -149,7 +163,7 @@ class RecipeDetail extends Component {
               <h2>Ingredients</h2>
               <ul className='inside'>
                 {ingredients.map((ingredient,idx) => (
-                    <li key={idx}>{ingredient}</li>
+                    <li key={idx}>{ingredient.ingredients_desc}</li>
                 ))}
               </ul>
             </div>
@@ -158,7 +172,7 @@ class RecipeDetail extends Component {
               {steps.map((step,idx) => (
                 <div  key={idx}>
                   <h4>Step {idx+1}</h4>
-                  <p>{step}</p>
+                  <p>{step.steps_desc}</p>
                 </div>
               ))}
             </div>
@@ -177,4 +191,13 @@ class RecipeDetail extends Component {
   }
 }
 
-export default withRouter(RecipeDetail);
+//export default withRouter(RecipeDetail);
+
+function mapStateToProps(state) {
+  console.log("PostForm", state)
+  return {
+      currentUser: state.user.currentUser
+  }
+}
+
+export default connect(mapStateToProps, actions)(RecipeDetail);

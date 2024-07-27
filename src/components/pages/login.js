@@ -1,20 +1,25 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import Logo from '../../../static/assets/images/cook-logo.png';
+import { connect } from 'react-redux';
+import * as actions from '../../actions';
+
 import authImg from '../../../static/assets/images/auth-img.png';
+import Logo from '../../../static/assets/images/cook-logo.png';
 
-export default class Login extends Component {
-  constructor() {
-    super();
+
+class Login extends Component {
+  constructor(props) {
+    super(props);
 
     this.state = {
       username: "",
       password: "",
       errorText: ""
     }
+
     this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleChange(event) {
@@ -25,10 +30,11 @@ export default class Login extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    // TODO
-    // Call to the API to login the user
-    console.log("handleSubmit", event);
+    this.props.login(this.state, () => {
+      this.props.history.push("/");
+    });
   }
+
   render() {
     return (
       <div className='auth-page-wrapper'>
@@ -51,6 +57,7 @@ export default class Login extends Component {
               placeholder="username"
               name="username"
               onChange={this.handleChange}/>
+            
             <input required
               type="password"
               placeholder="password"
@@ -63,5 +70,7 @@ export default class Login extends Component {
         </div>
       </div>
     );
-  }
+  } 
 }
+
+export default connect(null, actions)(Login);

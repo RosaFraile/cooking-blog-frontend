@@ -4,6 +4,9 @@ import DropzoneComponent from "react-dropzone-component";
 import ReactHtmlParser from "react-html-parser";
 import axios from 'axios';
 import moment from 'moment';
+import { connect } from 'react-redux';
+
+import * as actions from '../../actions';
 
 import "../../../node_modules/react-dropzone-component/styles/filepicker.css";
 import "../../../node_modules/dropzone/dist/min/dropzone.min.css";
@@ -12,7 +15,7 @@ import Navbar from '../navigation/navbar';
 import Footer from '../footer/footer';
 import RichTextEditor from "../forms/rich-text-editor";
 
-export default class PostForm extends Component {
+class PostForm extends Component {
   constructor(props) {
     super(props);
 
@@ -23,13 +26,14 @@ export default class PostForm extends Component {
       servings: "",
       img: "",
       cat_name: "starters",
+      user_id: this.props.currentUser.users_id,
       published_on: "",
       publish_status: "draft",
       ingredients: [],
       steps: [],
       ingredient: "",
       step: "",
-      apiUrl: "http://localhost:5000/recipe",
+      apiUrl: "http://localhost:5000/recipes",
       apiAction: "post"
     }
 
@@ -87,6 +91,7 @@ export default class PostForm extends Component {
   }
 
   componentDidMount() {
+    console.log("Current User", this.props.currentUser)
     if (this.props.editMode) {
       this.setState({
         id: this.props.post.id,
@@ -96,9 +101,10 @@ export default class PostForm extends Component {
         prep_time: this.props.post.prep_time,
         servings: this.props.post.servings,
         cat_name: this.props.post.cat_name,
+        user_id: this.props.post.user_id,
         published_on: this.props.post.published_on,
         publish_status: this.props.post.publish_status,
-        apiUrl: `http://localhost:5000/recipe/${
+        apiUrl: `http://localhost:5000/recipes/${
           this.props.post.id
         }`,
         apiAction: "patch"
@@ -134,41 +140,43 @@ export default class PostForm extends Component {
   buildForm() {
     let formData = new FormData();
 
-    this.state.publish_status === "published" ?
-      (this.state.published_on = moment()
-      ):(
-      null)
+    if(this.state.publish_status === "published") {
+      const published_on = moment().format('YYYY-MM-DD HH:mm:ss');
+      console.log("Published_on", published_on)
+      /*this.setState({
+        published_on: published_on
+      }, console.log("Published_on", this.state.published_on))*/
+      this.state.published_on = moment().format('YYYY-MM-DD HH:mm:ss');
+      console.log("Published_on", this.state.published_on)
+    }
 
     console.log(this.state.ingredients)
     console.log(this.state.steps)
 
-
-    formData.append("post[title]", this.state.title);
-    formData.append("post[desc]", this.state.desc);
-    formData.append("post[prep_time]", this.state.prep_time);
-    formData.append("post[servings]", this.state.servings);
-    formData.append("post[cat_name]", this.state.cat_name);
-    formData.append("post[published_on]", this.state.published_on);
-    formData.append("post[publish_status]", this.state.publish_status);
+    formData.append("title", this.state.title);
+    formData.append("desc", this.state.desc);
+    formData.append("prep_time", this.state.prep_time);
+    formData.append("servings", this.state.servings);
+    formData.append("cat_name", this.state.cat_name);
+    formData.append("user_id", this.state.user_id);
+    formData.append("published_on", this.state.published_on);
+    formData.append("publish_status", this.state.publish_status);
 
     for (let i=0; i<this.state.ingredients.length; i++) {
-      formData.append("post[ingredient"+i+"]", this.state.ingredients[i]);
+      formData.append("ingredients["+i+"]", this.state.ingredients[i]);
     }
     for (let i=0; i<this.state.steps.length; i++) {
-      formData.append("post[step"+i+"]", this.state.steps[i]);
+      formData.append("steps["+i+"]", this.state.steps[i]);
     }
-    
-//    formData.append("post[ingredients]", this.state.ingredients);
-//    formData.append("post[steps]", this.state.steps);
-
     if (this.state.img) {
-      formData.append("post[img]", this.state.img);
+      formData.append("file", this.state.img);
     }
 
     return formData;
   }
 
   handleSubmit(event) {
+    console.log("Paso por handleSubmit")
 
     axios({
       method: this.state.apiAction,
@@ -178,13 +186,14 @@ export default class PostForm extends Component {
         'content-type': 'multipart/form-data'
       }
     }).then(response => {
+        console.log("response: ", response)
         if (this.state.img) {
           this.imageRef.current.dropzone.removeAllFiles();
         }
 
         this.setState({
           title: "",
-          desc:"",
+          desc: "",
           prep_time: "",
           servings: "",
           img: "",
@@ -195,7 +204,7 @@ export default class PostForm extends Component {
           steps: [],
           ingredient: "",
           step: "",
-          apiUrl: "http://localhost:5000/recipe",
+          apiUrl: "http://localhost:5000/recipes",
           apiAction: "post"
         });
 
@@ -220,17 +229,6 @@ export default class PostForm extends Component {
           <div className='write-recipe-top'>
             <div className='introduction'>
               <h2>How to write a recipe</h2>
-              <ul>
-                <li>
-                  The description is optional. The rest of the fields are compulsory.
-                </li>
-                <li>
-                  You need to add al least one Ingredient and one Step.
-                </li>
-                <li>
-                  You can see the result on the Preview when you add some field
-                </li>
-              </ul>
             </div>
           </div>
           <div className='write-recipe-bottom'>
@@ -302,7 +300,7 @@ export default class PostForm extends Component {
                 </div>
                 <div className="image-uploaders">
                   <DropzoneComponent
-                    ref={this.featuredImageRef}
+                    ref={this.imageRef}
                     config={this.componentConfig()}
                     djsConfig={this.djsConfig()}
                     eventHandlers={this.handleImageDrop()}
@@ -320,7 +318,7 @@ export default class PostForm extends Component {
                       id="draft"
                       onChange={this.handleChange}
                     />
-                    <label htmlFor='draft'>Draft</label>
+                    <label htmlFor='draft'>Save as draft</label>
                   </div>
                   <div className='publish'>
                     <input
@@ -334,22 +332,19 @@ export default class PostForm extends Component {
                     <label htmlFor='published'>Publish</label>
                   </div>
                 </div>
+                
                 <div className='submit-button'>
                   <button type="submit">Save</button>
                 </div>
               </form>
             </div>
-
             <div className='write-recipe-right-column'>
               <h2>Preview</h2>
               <div className='preview'>
                 <div className='preview-title'>
                   <h6 className='cursive'>how to make...</h6>
                   <h5>{this.state.title}</h5>
-                </div>
-
-                
-
+                </div>   
                 <div className='preview-desc'>
                   {ReactHtmlParser(this.state.desc)}
                 </div>
@@ -376,7 +371,6 @@ export default class PostForm extends Component {
                     </div>
                   </div>
                 </div>
-                
                 <div className='preview-ingredients'>
                   <h5>Ingredients</h5>
                   <ul>
@@ -411,3 +405,12 @@ export default class PostForm extends Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  console.log("PostForm", state)
+  return {
+      currentUser: state.user.currentUser
+  }
+}
+
+export default connect(mapStateToProps, actions)(PostForm);

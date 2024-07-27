@@ -12,9 +12,9 @@ class Register extends Component {
     super(props);
 
     this.state = {
-      users_username: "",
-      users_email: "",
-      users_password: "",
+      username: "",
+      email: "",
+      password: "",
       errorText: ""
     }
 
@@ -36,7 +36,7 @@ class Register extends Component {
       withCredentials: true
     }).then(response => {
       console.log(response);
-      if(response.data !== "User has been created.") {
+      if(response.data !== "200") {
         this.setState({
           errorText: response.data
         })
@@ -65,20 +65,20 @@ class Register extends Component {
           </div>
           <h1>Login to access your posts</h1>
           <form onSubmit={this.handleSubmit}>
-            <input required 
+          <input required 
               type="text"
               placeholder="username"
-              name="users_username"
+              name="username"
               onChange={this.handleChange}/>
             <input required 
-              type="text"
+              type="email"
               placeholder="email"
-              name="users_email"
+              name="email"
               onChange={this.handleChange}/>
             <input required
               type="password"
               placeholder="password"
-              name="users_password"
+              name="password"
               onChange={this.handleChange}/>
             <button type="submit">Register</button>
           </form>

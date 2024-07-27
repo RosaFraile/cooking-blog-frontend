@@ -9,6 +9,10 @@ body {
     font-family: "Sofia Sans", sans-serif;
 }
 
+ul {
+    list-style-position: inside;
+}
+
 .link {
     text-decoration: none;
     color: inherit;
