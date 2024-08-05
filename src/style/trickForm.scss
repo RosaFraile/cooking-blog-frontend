@@ -1,0 +1,29 @@
+.write-trick-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .write-trick-container {
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        form {
+            @include post-form();
+
+            .publish-option {
+                .publish {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+            }
+
+            .submit-button {
+                @include form-button();
+            }
+        }
+    }
+}

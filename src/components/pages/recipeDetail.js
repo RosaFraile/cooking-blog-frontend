@@ -3,14 +3,13 @@ import axios from 'axios';
 import moment from 'moment';
 import ReactHtmlParser from "react-html-parser";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import * as actions from '../../actions';
 
 import Navbar from '../navigation/navbar';
 import Footer from '../footer/footer';
-import PostForm from '../posts/postForm';
+import RecipeForm from '../recipes/recipeForm';
 
 class RecipeDetail extends Component {
   constructor(props) {
@@ -20,7 +19,6 @@ class RecipeDetail extends Component {
       currentId: this.props.match.params.id,
       recipeItem: {},
       ingredients: [],
-      steps : [],
       editMode: false
     }
     
@@ -32,8 +30,9 @@ class RecipeDetail extends Component {
   }
 
   handleDeleteClick() {
-    axios.delete(`http://localhost:5000/recipes/${this.state.currentId}`)
+    axios.delete(`http://localhost:5000/recipes/${this.state.currentId}`, { withCredentials:true })
     .then(response => {
+      console.log(response)
       this.props.history.push("/");
     }).catch(error => {
       console.log("handleDelete error", error)
@@ -56,21 +55,19 @@ class RecipeDetail extends Component {
   }
 
   handleEditClick() {
-//    if (this.props.loggedInStatus === "LOGGED_IN") {
+    if (this.props.currentUser) {
       this.setState({ editMode: true });
-//    }
+    }
   }
 
   getRecipeItem() {
-    console.log("Current ID", this.state.currentId)
     axios
       .get(`http://localhost:5000/recipes/${this.state.currentId}`)
       .then(response => {
-        console.log(response)
+        const ingredients = response.data[0].recipes_ingredients.split("|")
         this.setState({
-          recipeItem: response.data,
-          ingredients: response.data.ingredients,
-          steps: response.data.steps
+          recipeItem: response.data[0],
+          ingredients
         })
       }).catch(error => {
         console.log(error);
@@ -78,36 +75,18 @@ class RecipeDetail extends Component {
   }
 
   componentDidMount() {
-    console.log("Paso por aqui componentDidMount")
     this.getRecipeItem();
   }
 
   render() {
-    const {
-      title,
-      desc,
-      prep_time,
-      servings,
-      img_url,
-      published_on,
-      users_username
-    } = this.state.recipeItem;
-
-    console.log(this.state.recipeItem)
-    
-    const ingredients = this.state.ingredients;
-    const steps = this.state.steps;
-    console.log(ingredients)
-    console.log(steps)
-
     const contentManager = () => {
       if (this.state.editMode) {
         return (
-          <PostForm
+          <RecipeForm
             handleImageDelete={this.handleImageDelete}
             handleUpdateFormSubmission={this.handleUpdateFormSubmission}
             editMode={this.state.editMode}
-            post={this.state.recipeItem}
+            recipe={this.state.recipeItem}
           />
         );
       } else {
@@ -115,20 +94,17 @@ class RecipeDetail extends Component {
           <div className='recipe-detail-wrapper'>
             <div className='title'>
               <h2>how to make...</h2>
-              <h1>{title}</h1>
-            </div>
-            <div className='description'>
-              {ReactHtmlParser(desc)}
+              <h1>{this.state.recipeItem.recipes_title}</h1>
             </div>
             <div className='author-date'>
               <div className='author'>
-                <p>By <span>{users_username}</span></p>
+                <p>By <span>{this.state.recipeItem.users_username}</span></p>
               </div>
               <div className='date'>
-                <p>Published on {moment(published_on).format("MMMM DD, YYYY")}</p>
+                <p>Published on {moment(this.state.recipeItem.recipes_published_on).format("MMMM DD, YYYY")}</p>
               </div>
               {
-                this.props.currentUser.users_username === users_username ?
+                (this.props.currentUser && this.props.currentUser.users_username === this.state.recipeItem.users_username) ?
                 (<div className="edit-delete">
                   <div onClick={this.handleEditClick} className='edit'>
                     <FontAwesomeIcon icon="edit" />
@@ -144,37 +120,34 @@ class RecipeDetail extends Component {
             </div>
             <div className='image'>
             
-              <img src={`http://localhost:5000/images/${img_url}`} alt="Featured image" />
+              <img src={`http://localhost:5000/images/${this.state.recipeItem.recipes_img_url}`} alt="Featured image" />
             </div>
             <div className='time-servings'>
               <div className='prep-time'>
                 <div>
                   <FontAwesomeIcon icon="clock" />
                 </div>
-                <div>{prep_time}</div>
+                <div>{this.state.recipeItem.recipes_prep_time}</div>
               </div>
               <div className='servings'>
                 <div>Servings</div>
-                <div>{servings}</div>
+                <div>{this.state.recipeItem.recipes_servings}</div>
               </div>
               
             </div>
             <div className='ingredients'>
               <h2>Ingredients</h2>
-              <ul className='inside'>
-                {ingredients.map((ingredient,idx) => (
-                    <li key={idx}>{ingredient.ingredients_desc}</li>
+              <div>
+                <ul>
+                {this.state.ingredients.map((ingredient, idx) => (
+                  <li key={idx}>{ingredient}</li>
                 ))}
-              </ul>
+                </ul>
+              </div>
             </div>
             <div className='steps'>
-              <h2>Steps</h2>
-              {steps.map((step,idx) => (
-                <div  key={idx}>
-                  <h4>Step {idx+1}</h4>
-                  <p>{step.steps_desc}</p>
-                </div>
-              ))}
+              <h2>Directions</h2>
+              {ReactHtmlParser(this.state.recipeItem.recipes_directions)}
             </div>
           </div>
         );
@@ -191,10 +164,7 @@ class RecipeDetail extends Component {
   }
 }
 
-//export default withRouter(RecipeDetail);
-
 function mapStateToProps(state) {
-  console.log("PostForm", state)
   return {
       currentUser: state.user.currentUser
   }

@@ -8,9 +8,6 @@ const INIT_STATE = {
 }
 
 export default function(state=INIT_STATE, action) {
-    console.log(action)
-    console.log(state)
-    console.log("localStorage", localStorage.getItem("user"))
     switch (action.type) {
         case LOGIN:
             const currentUser = action.payload

@@ -34,7 +34,7 @@ export default class Tricks extends Component {
         <div className='tricks-wrapper'>
           <div className='tricks'>
             {this.state.tricks.map(trick => (
-              <TrickItem trickItem={trick} key={trick.id} />
+              <TrickItem trickItem={trick} key={trick.tricks_id} />
             ))}
           </div>
         </div>

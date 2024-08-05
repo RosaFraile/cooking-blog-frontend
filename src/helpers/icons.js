@@ -8,7 +8,9 @@ import {
   faClock,
   faCopyright,
   faTrash,
-  faUser
+  faUser,
+  faChevronDown,
+  faChevronUp
 } from "@fortawesome/free-solid-svg-icons";
 
 const Icons = () => {
@@ -21,7 +23,9 @@ const Icons = () => {
       faClock,
       faCopyright,
       faTrash,
-      faUser
+      faUser,
+      faChevronDown,
+      faChevronUp
     );
 };
 

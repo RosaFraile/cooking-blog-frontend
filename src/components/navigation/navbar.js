@@ -1,15 +1,19 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import axios from "axios";
 import { connect } from 'react-redux';
+import Dropdown from '../dropdown/dropdown';
+import DropdownItem from '../dropdown/dropdownItem';
 
 import * as actions from '../../actions';
 
 import Logo from '../../../static/assets/images/cook-logo.png';
 
+
 class Navbar extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.handleHamburgerMenu = this.handleHamburgerMenu.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
@@ -27,11 +31,11 @@ class Navbar extends Component {
         document.getElementById('links-list').classList.toggle('visible');
     }
 
-    handleLogout() {
+    handleLogout(event) {
         event.preventDefault();
         this.props.logout();
     }
-
+    
     render() {
         return (
             <div className='navbar'>
@@ -47,42 +51,63 @@ class Navbar extends Component {
                         </div>
                     </div>
                     <div className='right-column'>
-                    <div><FontAwesomeIcon icon="user" /> {this.props.currentUser ?  this.props.currentUser.users_username : null}</div>
-                        {this.props.currentUser ? (<Link to="/" onClick={this.handleLogout} className='logStatus link'>Logout</Link>) : (<Link to="/login" className='logStatus link'>Login</Link>)}
                         <div>
                             {this.props.currentUser ?
-                                (   <Link className='write link' to="/write">
-                                        <FontAwesomeIcon icon="circle-plus" />
-                                    </Link>
+                                (   <Dropdown
+                                        buttonText={<FontAwesomeIcon className="write" icon="circle-plus" />}
+                                        content={(<div>
+                                            <Link className="link" to="/recipeManager">
+                                                <DropdownItem>Recipe</DropdownItem>
+                                            </Link>
+                                            <Link className="link" to="/trickManager">
+                                                <DropdownItem>Trick</DropdownItem>
+                                            </Link>
+                                        </div>
+                                        )}
+                                    ></Dropdown>
                                 ):(
                                     null
                                 )
-                            }
-                            
+                            }    
                         </div>
+                    <div>
+                        <FontAwesomeIcon icon="user" /> {this.props.currentUser ?  this.props.currentUser.users_username : null}
+                    </div>
+                        <div>
+                            {this.props.currentUser ?
+                                (
+                                    <Link to="/" onClick={this.handleLogout} className='logStatus link'>Logout</Link>
+                                ) : (
+                                    <Link to="/login" className='logStatus link'>Login</Link>
+                                )
+                            }
+                        </div>
+                        
                     </div>
                 </div>
                 <div className='bottom-navbar' id='links-list'>
                     <div className='navbar-links'>
-                        <Link className="navbar-link link" to="/?cat=starters">
-                            <h6>STARTERS</h6>
-                        </Link>
-                        
-                        <Link className="navbar-link link" to="/?cat=main">
-                            <h6>MAIN COURSES</h6>
-                        </Link>
-                        <Link className="navbar-link link" to="/?cat=second">
-                            <h6>SECOND COURSES</h6>
-                        </Link>
-                        <Link className="navbar-link link" to="/?cat=desserts">
-                            <h6>DESSERTS</h6>
-                        </Link>
-                        <Link className="navbar-link link" to="/tricks">
+                        <NavLink className="navbar-link link" exact to="/" activeClassName="nav-link-active">
+                            <h6>RECIPES</h6>
+                        </NavLink>
+                        <NavLink className="navbar-link link" to="/tricks" activeClassName="nav-link-active">
                             <h6>COOKING TRICKS</h6>
-                        </Link>
-                        <Link className="navbar-link link" to="/about">
+                        </NavLink>
+                        {this.props.currentUser ? (
+                            <div className='manager-group'>
+                                <NavLink className="navbar-link link" to="/recipeManager" activeClassName="nav-link-active">
+                                    <h6>RECIPES MANAGER</h6>
+                                </NavLink>
+                                <NavLink className="navbar-link link" to="/trickManager" activeClassName="nav-link-active">
+                                    <h6>TRICKS MANAGER</h6>
+                                </NavLink>
+                            </div>
+                        ) : (
+                            null
+                        )}
+                        <NavLink className="navbar-link link" to="/about" activeClassName="nav-link-active">
                             <h6>ABOUT US</h6>
-                        </Link>
+                        </NavLink>
                     </div>
                 </div>
             </div>
@@ -91,7 +116,6 @@ class Navbar extends Component {
 }
 
 function mapStateToProps(state) {
-    console.log("From Navbar", state)
     return {
         currentUser: state.user.currentUser
     }

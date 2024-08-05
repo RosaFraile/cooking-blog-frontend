@@ -1,0 +1,51 @@
+.recipe-item {
+    padding: 21px;
+
+    .recipe-img img {
+        width: 100%;
+    }
+
+    .text-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .recipe-data {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+
+            .title {
+                color: $offwhite;
+                font-size: 1.5em;
+            }
+    
+            .publish-status {
+                color: $light-grey;
+            }
+
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 15px;
+
+            .edit {
+                @include action-button();
+
+                &:hover {
+                    color: $teal;
+                }
+            }
+
+            .trash {
+                @include action-button();
+
+                &:hover {
+                    color: $warning;
+                }
+            }
+        }
+    }
+}

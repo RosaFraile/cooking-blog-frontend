@@ -30,8 +30,7 @@ class Register extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    // TODO
-    // Call to the API to register the user
+    
     axios.post("http://localhost:5000/auth/register", this.state, {
       withCredentials: true
     }).then(response => {
