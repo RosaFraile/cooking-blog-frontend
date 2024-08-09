@@ -8,12 +8,36 @@
         display: flex;
         justify-content: center;
         width: 100%;
+        margin-top: 30px;
         margin-bottom: 30px;
         
         .home {
-            width: 1000px;
+            max-width: 1000px;
             display: flex;
+            flex-direction: column;
             justify-content: center;
+
+            .categories {
+                display: flex;
+                justify-content: center;
+                flex-wrap: nowrap;
+                gap: 20px;
+
+                button {
+                    padding: 5px 10px;
+                    background-color: $light-green;
+                    border: none;
+                    border-radius: 6px;
+
+                    &:hover {
+                        background-color: $teal;
+                    }
+
+                    h6 {
+                        text-transform: uppercase;
+                    }
+                }
+            }
 
             .recipes {
                 margin-top: 50px;
@@ -33,10 +57,7 @@
                 
                     .img {
                         flex: 2;
-                        padding-bottom: 5px;
-                        padding-left: 5px;
                         border-radius: 25px;
-                        background-color: $light-green;
                 
                         img {
                             width: 400px;

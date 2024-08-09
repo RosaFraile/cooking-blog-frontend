@@ -24,7 +24,7 @@ const RecipeSidebarList = (props) => {
                             <FontAwesomeIcon icon="edit" />
                         </a>
                         <a className="action-icon trash" onClick={() => props.handleDeleteClick(recipeItem)}>
-                            <FontAwesomeIcon icon="trash" />
+                            <FontAwesomeIcon icon="trash-can" />
                         </a>
                     </div>
                 </div>

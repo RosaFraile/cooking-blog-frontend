@@ -105,13 +105,22 @@
             }    
         }
 
-        .steps {
+        .directions {
             display: flex;
             flex-direction: column;
             gap:10px;
 
-            p {
-                font-family: "Libre Baskerville", serif;
+            .directions-text {
+                ol {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 15px;
+
+                    li {
+                        font-family: "Libre Baskerville", serif;
+                        line-height: 30px;
+                    }
+                }
             }
         }
     }

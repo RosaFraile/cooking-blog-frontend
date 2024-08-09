@@ -10,15 +10,17 @@ import RecipeSidebarList from '../recipes/recipeSidebarList'
 import RecipeForm from './recipeForm';
 
 class RecipeManager extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       recipeItems: [],
-      recipeToEdit: {}
+      recipeToEdit: {},
+      ingredients: [],
+      directions: []
     };
 
-    this.handleNewFormSubmission = this.handleNewFormSubmission.bind(this);
+    this.handleSuccessfulFormSubmission = this.handleSuccessfulFormSubmission.bind(this);
     this.handleEditFormSubmission = this.handleEditFormSubmission.bind(this);
     this.handleFormSubmissionError = this.handleFormSubmissionError.bind(this);
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
@@ -28,18 +30,21 @@ class RecipeManager extends Component {
 
   clearRecipeToEdit() {
     this.setState({
-      recipeToEdit: {}
+      recipeToEdit: {},
+      ingredients: [],
+      directions: []
     })
   }
 
   handleDeleteClick(recipeItem) {
+    console.log(recipeItem);
     axios
-      .delete(`http://localhost:5000/recipes/${recipeItem.id}`,
+      .delete(`http://localhost:5000/recipes/${recipeItem.recipes_id}`,
         { withCredentials: true }
       ).then(response => {
         this.setState({
           recipeItems: this.state.recipeItems.filter(item => {
-            return item.id !== recipeItem.id;
+            return item.recipes_id !== recipeItem.recipes_id;
           })
         })
         return response.data;
@@ -49,16 +54,22 @@ class RecipeManager extends Component {
   }
 
   handleEditClick(recipeItem) {
-    this.setState({
-      recipeToEdit: recipeItem
-    })
+    if (this.props.currentUser) {
+      const ingredients = recipeItem.recipes_ingredients.split("|");
+      const directions = recipeItem.recipes_directions.split("|");
+      this.setState({ 
+        recipeToEdit: recipeItem,
+        ingredients,
+        directions
+      });
+    }
   }
 
   handleEditFormSubmission() {
     this.getRecipeItems();
   }
 
-  handleNewFormSubmission(recipeItem) {
+  handleSuccessfulFormSubmission(recipeItem) {
     this.setState({
       recipeItems: [recipeItem].concat(this.state.recipeItems)
     })
@@ -71,7 +82,6 @@ class RecipeManager extends Component {
   getRecipeItems() {
     axios.get(`http://localhost:5000/recipes?user=${this.props.currentUser.users_id}`, { withCredentials: true})
       .then(response => {
-        // handle success
         console.log(response.data)
         this.setState({ 
           recipeItems: response.data
@@ -92,13 +102,15 @@ class RecipeManager extends Component {
         <Navbar />
         <div className='recipe-manager-wrapper'>
           <div className='left-column'>
-              <RecipeForm
-                handleNewFormSubmission={this.handleNewFormSubmission}
-                handleEditFormSubmission={this.handleEditFormSubmission}
-                handleFormSubmissionError={this.handleFormSubmissionError}
-                clearRecipeToEdit={this.clearRecipeToEdit}
-                recipeToEdit={this.state.recipeToEdit}
-              />
+          <RecipeForm
+            handleSuccessfulFormSubmission={this.handleSuccessfulFormSubmission}
+            handleFormSubmissionError={this.handleFormSubmissionError}
+            handleEditFormSubmission={this.handleEditFormSubmission}
+            clearRecipeToEdit={this.clearRecipeToEdit}
+            recipeToEdit={this.state.recipeToEdit}
+            ingredients={this.state.ingredients}
+            directions={this.state.directions}
+          />
           </div>
           <div className='right-column'>
             <RecipeSidebarList
@@ -106,10 +118,10 @@ class RecipeManager extends Component {
               handleDeleteClick={this.handleDeleteClick}
               handleEditClick={this.handleEditClick}
             />
-          </div>    
-        </div>
+          </div>  
+        </div>  
         <Footer />
-      </div> 
+      </div>
     );
   }
 }

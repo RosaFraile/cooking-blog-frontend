@@ -19,6 +19,7 @@ class RecipeDetail extends Component {
       currentId: this.props.match.params.id,
       recipeItem: {},
       ingredients: [],
+      directions: [],
       editMode: false
     }
     
@@ -39,9 +40,9 @@ class RecipeDetail extends Component {
     })
   }
 
-  handleUpdateFormSubmission(post) {
+  handleUpdateFormSubmission(recipe) {
     this.setState({
-      recipeItem: post,
+      recipeItem: recipe,
       editMode: false
     });
   }
@@ -64,11 +65,15 @@ class RecipeDetail extends Component {
     axios
       .get(`http://localhost:5000/recipes/${this.state.currentId}`)
       .then(response => {
+        console.log("Response API", response.data[0])
         const ingredients = response.data[0].recipes_ingredients.split("|")
+        const directions = response.data[0].recipes_directions.split("|")
         this.setState({
           recipeItem: response.data[0],
-          ingredients
+          ingredients,
+          directions
         })
+        console.log("Recipe item", this.state.recipeItem)
       }).catch(error => {
         console.log(error);
       })
@@ -86,7 +91,9 @@ class RecipeDetail extends Component {
             handleImageDelete={this.handleImageDelete}
             handleUpdateFormSubmission={this.handleUpdateFormSubmission}
             editMode={this.state.editMode}
-            recipe={this.state.recipeItem}
+            recipeToEdit={this.state.recipeItem}
+            ingredients={this.state.ingredients}
+            directions={this.state.directions}
           />
         );
       } else {
@@ -110,7 +117,7 @@ class RecipeDetail extends Component {
                     <FontAwesomeIcon icon="edit" />
                   </div>
                   <div  onClick={this.handleDeleteClick} className='delete'>
-                    <FontAwesomeIcon icon="trash" />
+                    <FontAwesomeIcon icon="trash-can" />
                   </div>
                 </div>
                 ):(
@@ -119,7 +126,6 @@ class RecipeDetail extends Component {
               }
             </div>
             <div className='image'>
-            
               <img src={`http://localhost:5000/images/${this.state.recipeItem.recipes_img_url}`} alt="Featured image" />
             </div>
             <div className='time-servings'>
@@ -145,9 +151,15 @@ class RecipeDetail extends Component {
                 </ul>
               </div>
             </div>
-            <div className='steps'>
+            <div className='directions'>
               <h2>Directions</h2>
-              {ReactHtmlParser(this.state.recipeItem.recipes_directions)}
+              <div className='directions-text'>
+                <ol>
+                  {this.state.directions.map((direction, idx) => (
+                    <li key={idx}>{direction}</li>
+                  ))}
+                </ol>
+              </div>
             </div>
           </div>
         );

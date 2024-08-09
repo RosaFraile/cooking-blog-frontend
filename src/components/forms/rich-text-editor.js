@@ -58,7 +58,7 @@ export default class RichTextEditor extends Component {
           wrapperClassName="demo-wrapper"
           editorClassname="demo-editor"
           onEditorStateChange={this.onEditorStateChange}
-          placeholder={"Description"}
+          placeholder={"Directions"}
           toolbar={{
             inline: { inDropdown: true },
             list: { inDropdown: true },

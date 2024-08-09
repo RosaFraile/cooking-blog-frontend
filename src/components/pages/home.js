@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 import Navbar from '../navigation/navbar';
 import Footer from '../footer/footer'
 import RecipeItem from '../recipes/recipeItem';
@@ -10,16 +9,31 @@ export default class Home extends Component {
     super();
 
     this.state = {
-      recipes: []
+      categories: [],
+      recipes: [],
+      category: "all"
     }
+
     this.handleCatFilter = this.handleCatFilter.bind(this);
   }
   
-  handleCatFilter(cat) {
-
+  handleCatFilter(category) {
+    this.setState({
+      category
+    })
+    
   }
 
   componentDidMount() {
+    axios.get("http://localhost:5000/categories")
+      .then(response => {
+        this.setState({
+          categories: response.data
+        })
+      }).catch(error => {
+        console.log("Get all categories error", error);
+      })
+
     axios.get("http://localhost:5000/recipes")
       .then(response => {
         this.setState({
@@ -29,6 +43,32 @@ export default class Home extends Component {
         console.log("Get all recipes error", error);
       })
   }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.category !== this.state.category) {
+      if (this.state.category === "all") {
+        axios.get("http://localhost:5000/recipes")
+          .then(response => {
+            console.log("Response data all", response)
+            this.setState({
+              recipes: response.data
+            })
+          }).catch(error => {
+            console.log("Get all recipes error", error);
+          })
+      } else {
+        axios.get(`http://localhost:5000/recipes?cat=${this.state.category}`)
+          .then(response => {
+            console.log("Response data category", response)
+            this.setState({
+              recipes: response.data
+            })
+          }).catch(error => {
+            console.log("Get recipes by category error", error);
+          })
+      }
+    }
+  }
   
   render() {
     return (
@@ -36,19 +76,25 @@ export default class Home extends Component {
         <Navbar />
         <div className='home-wrapper'>
           <div className='home'>
-          <Link onClick={this.handleCatFilter("starters")} className="navbar-link link" to="?cat=starters">
-                            <h6>STARTERS</h6>
-                        </Link>
-                        
-                        <Link onClick={this.handleCatFilter("main")} className="navbar-link link" to="?cat=main">
-                            <h6>MAIN COURSES</h6>
-                        </Link>
-                        <Link onClick={this.handleCatFilter("second")} className="navbar-link link" to="?cat=second">
-                            <h6>SECOND COURSES</h6>
-                        </Link>
-                        <Link onClick={this.handleCatFilter("desserts")} className="navbar-link link" to="?cat=desserts">
-                            <h6>DESSERTS</h6>
-                        </Link>
+            <div className='categories'>
+              <button
+                onClick={()=> {
+                  this.handleCatFilter("all")
+                }}
+              >
+                <h6>all</h6>
+              </button> 
+              {this.state.categories.map((category) => (
+                  <button
+                    key={category.categories_id}
+                    onClick={()=> {
+                      this.handleCatFilter(`${category.categories_name}`)
+                    }}
+                  >
+                    <h6>{category.categories_name}</h6>
+                  </button> 
+              ))}
+            </div>
             <div className='recipes'>
               {this.state.recipes.map(recipe => (
                 <RecipeItem recipeItem={recipe} key={recipe.recipes_id} />

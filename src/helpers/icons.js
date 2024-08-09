@@ -8,6 +8,7 @@ import {
   faClock,
   faCopyright,
   faTrash,
+  faTrashCan,
   faUser,
   faChevronDown,
   faChevronUp
@@ -23,6 +24,7 @@ const Icons = () => {
       faClock,
       faCopyright,
       faTrash,
+      faTrashCan,
       faUser,
       faChevronDown,
       faChevronUp

@@ -4,6 +4,9 @@ import {
   Switch,
   Route 
 } from "react-router-dom";
+import { connect } from 'react-redux';
+
+import * as actions from '../actions';
 
 import Home from "./pages/home";
 import Register from "./pages/register";
@@ -17,11 +20,20 @@ import NoMatch from "./pages/noMatch";
 
 import Icons from "../helpers/icons";
 
-export default class App extends Component {
+class App extends Component {
   constructor(props) {
     super(props);
 
     Icons();
+
+    this.authorizedPages = this.authorizedPages.bind(this);
+  }
+
+  authorizedPages() {
+    return [
+      <Route key="recipe-manager" path="/recipeManager" component={RecipeManager} />,
+      <Route key="trick-manager" path="/trickManager" component={TrickManager} />
+    ]
   }
 
   render() {
@@ -33,11 +45,10 @@ export default class App extends Component {
               <Route exact path="/" component={Home} />
               <Route path="/register" component={Register} />
               <Route path="/login" component={Login}/>
-              <Route path="/recipeManager" component={RecipeManager} />
-              <Route path="/trickManager" component={TrickManager} />
               <Route path="/recipe/:id" component={RecipeDetail}/>
               <Route path="/tricks" component={Tricks}/>
               <Route path="/about" component={About} />
+              {this.props.currentUser ? this.authorizedPages() : null}
               <Route component={NoMatch} />
             </Switch>
           </Router>
@@ -46,3 +57,11 @@ export default class App extends Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+      currentUser: state.user.currentUser
+  }
+}
+
+export default connect(mapStateToProps, actions)(App);
