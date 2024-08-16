@@ -1,21 +1,24 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { connect } from 'react-redux';
+
+import * as actions from '../../actions';
 
 import Navbar from '../navigation/navbar';
 import Footer from '../footer/footer';
 import TrickSidebarList from '../tricks/trickSidebarList'
 import TrickForm from './trickForm';
 
-export default class TrickManager extends Component {
-  constructor() {
-    super();
+class TrickManager extends Component {
+  constructor(props) {
+    super(props);
 
     this.state = {
       trickItems: [],
       trickToEdit: {}
     };
 
-    this.handleNewFormSubmission = this.handleNewFormSubmission.bind(this);
+    this.handleSuccessfulFormSubmission = this.handleSuccessfulFormSubmission.bind(this);
     this.handleEditFormSubmission = this.handleEditFormSubmission.bind(this);
     this.handleFormSubmissionError = this.handleFormSubmissionError.bind(this);
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
@@ -29,17 +32,16 @@ export default class TrickManager extends Component {
     })
   }
 
-  handleDeleteClick(portfolioItem) {
+  handleDeleteClick(trickItem) {
     axios
-      .delete(`http://localhost/tricks/${trickItem.id}`,
+      .delete(`http://localhost/tricks/${trickItem.tricks_id}`,
         { withCredentials: true }
       ).then(response => {
         this.setState({
           trickItems: this.state.trickItems.filter(item => {
-            return item.id !== trickItem.id;
+            return item.tricks_id !== trickItem.tricks_id;
           })
         })
-
         return response.data;
       }).catch(error => {
         console.log("handleDeleteClick error", error);
@@ -47,16 +49,18 @@ export default class TrickManager extends Component {
   }
 
   handleEditClick(trickItem) {
-    this.setState({
-      trickToEdit: trickItem
-    })
+    if (this.props.currentUser) {
+      this.setState({
+        trickToEdit: trickItem
+      })
+    }
   }
 
   handleEditFormSubmission() {
     this.getTrickItems();
   }
 
-  handleNewFormSubmission(trickItem) {
+  handleSuccessfulFormSubmission(trickItem) {
     this.setState({
       trickItems: [trickItem].concat(this.state.trickItems)
     })
@@ -67,16 +71,14 @@ export default class TrickManager extends Component {
   }
 
   getTrickItems() {
-    axios.get('http://localhost:5000/tricks?order_by=created_at&direction=desc', { withCredentials: true})
+    axios.get(`http://localhost:5000/tricks?user=${this.props.currentUser.users_id}`,
+      { withCredentials: true})
       .then(response => {
-        // handle success
-        console.log(response.data);
-    //    this.setState({
-    //      trickItems: response.data.recipe_items
-    //    })
+        this.setState({
+          trickItems: response.data
+        })
       })
       .catch(error => {
-        // handle error
         console.log("Error in getTrickItems", error);
       });
   }
@@ -92,9 +94,9 @@ export default class TrickManager extends Component {
         <div className='trick-manager-wrapper'>
           <div className='left-column'>
               <TrickForm
-                handleNewFormSubmission={this.handleNewFormSubmission}
-                handleEditFormSubmission={this.handleEditFormSubmission}
+                handleSuccessfulFormSubmission={this.handleSuccessfulFormSubmission}
                 handleFormSubmissionError={this.handleFormSubmissionError}
+                handleEditFormSubmission={this.handleEditFormSubmission}
                 clearTrickToEdit={this.clearTrickToEdit}
                 trickToEdit={this.state.trickToEdit}
               />
@@ -112,3 +114,11 @@ export default class TrickManager extends Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+      currentUser: state.user.currentUser
+  }
+}
+
+export default connect(mapStateToProps, actions)(TrickManager);

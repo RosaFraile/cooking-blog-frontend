@@ -1,0 +1,51 @@
+.trick-sidebar-list-wrapper {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .trick-sidebar-item {
+        display: flex;
+        align-items: center;
+        color: white;
+        gap: 15px;
+
+        .trick-content {
+            margin-left: 10px;
+            margin-right: 10px;
+
+            .title {
+
+            }
+
+            .publish-status {
+                font-size: 0.8rem;
+                color: $light-grey;
+            }
+        }
+
+        .actions {
+            display: flex;
+        //    flex-direction: column;
+            gap: 10px;
+
+            .action-icon {
+                cursor: pointer;
+            }
+
+            .edit {
+                &:hover {
+                    color: $teal;
+                }
+            }
+
+            .delete {
+                &:hover {
+                    color: $warning;
+                }
+            }
+
+        }
+    }
+}

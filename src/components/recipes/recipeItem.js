@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-/* {`http://localhost:5000/${props.recipeItem.img_url}`} */
+import moment from 'moment';
 
 const RecipeItem = (props) => {
   return (
@@ -23,7 +22,18 @@ const RecipeItem = (props) => {
           <div><FontAwesomeIcon icon="clock" /> {props.recipeItem.recipes_prep_time}</div>
           <div>Servings: {props.recipeItem.recipes_servings}</div>
         </div>
-        <div>By {props.recipeItem.users_username}</div>
+        <div className='author-date'>
+          <div className='author'>By {props.recipeItem.users_username}</div>
+          <div className='date'>
+            {props.recipeItem.recipes_publish_status === "published" ?
+              (
+                <p>Published on {moment(props.recipeItem.recipes_published_on).format("MMMM DD, YYYY")}</p>
+              ):(
+                <p>Draft</p>
+              )    
+            }
+          </div>
+        </div>
       </div>
     </div>
   );

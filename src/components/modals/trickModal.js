@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import ReactModal from 'react-modal';
 
+import TrickForm from '../tricks/trickForm';
+
 ReactModal.setAppElement(".app-wrapper");
 
-export default class MessageModal extends Component {
+export default class TrickModal extends Component {
     constructor(props) {
         super(props);
 
@@ -20,12 +22,20 @@ export default class MessageModal extends Component {
                 backgroundColor: "rgba(1, 1, 1, 0.75)"
             }
         }
+
+        this.handleUpdateFormSubmission = this.handleUpdateFormSubmission.bind(this);
     }
 
-    
+    handleUpdateFormSubmission() {
+        this.setState({
+            trickModalIsOpen: false
+        })
+        this.props.handleUpdateFormSubmission();
+    }
+
     handleCloseModal() {
         this.setState({
-          blogModalIsOpen: false
+          trickModalIsOpen: false
         })
       }
 
@@ -37,7 +47,11 @@ export default class MessageModal extends Component {
                     this.props.handleModalClose();
                 }}
                 isOpen={this.props.modalIsOpen} >
-                <h1>{this.pops.message}</h1>
+                <TrickForm
+                    handleUpdateFormSubmission={this.handleUpdateFormSubmission}
+                    editMode={this.props.editMode}
+                    trickToEdit={this.props.trickToEdit}
+                />
             </ReactModal>
         )
     }

@@ -22,9 +22,9 @@ class RecipeForm extends Component {
       servings: "",
       img: "",
       img_url: "",
-      published_on: "",
+      published_on: moment("1970-01-01").format('YYYY-MM-DD HH:mm:ss'),
       publish_status: "draft",
-      cat_name: "starters",
+      cat_name: "",
       user_id: this.props.currentUser.users_id,
       ingredientsList: [],
       ingredient: "",
@@ -32,7 +32,8 @@ class RecipeForm extends Component {
       direction: "",
       editMode: false,
       apiUrl: "http://localhost:5000/recipes",
-      apiAction: "post"
+      apiAction: "post",
+      categories: []
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -48,6 +49,23 @@ class RecipeForm extends Component {
     
     this.handleSubmit = this.handleSubmit.bind(this);
     this.deleteImage = this.deleteImage.bind(this);
+  }
+
+  mapCategoriesToState(categories) {
+    this.setState({
+      cat_name: categories[0].categories_name,
+      categories
+    })
+  }
+
+  getCategories() {
+    axios.get("http://localhost:5000/categories")
+      .then(response => {
+        console.log(response.data);
+        this.mapCategoriesToState(response.data);
+      }).catch(error => {
+        console.log("getCategories error", error)
+      })
   }
 
   deleteImage() {
@@ -103,8 +121,8 @@ class RecipeForm extends Component {
 
   componentDidMount() {
     // Edit mode from RecipeDetail
+    this.getCategories();
     if (this.props.editMode) {
-      console.log("Recipe to edit",this.props.recipeToEdit);
       this.setState({
         id: this.props.recipeToEdit.recipes_id,
         title: this.props.recipeToEdit.recipes_title,
@@ -125,16 +143,12 @@ class RecipeForm extends Component {
         }`,
         apiAction: "patch"
       });
-      console.log("Ingredients to edit", this.state.ingredients)
-      console.log("Directions to edit", this.state.directions)
     }
   }
 
   componentDidUpdate() {
     // Edit mode from RecipeSidebarList
     if(Object.keys(this.props.recipeToEdit).length > 0 && this.props.editMode === undefined) {
-      console.log("recipeToEdit", this.props.recipeToEdit)
-      
       const {
         recipes_directions,
         recipes_id,
@@ -198,6 +212,8 @@ class RecipeForm extends Component {
 
     if(this.state.publish_status === "published") {
       this.state.published_on = moment().format('YYYY-MM-DD HH:mm:ss');
+    } else if (this.state.publish_status === "draft") {
+      this.state.published_on = moment("1970-01-01").format('YYYY-MM-DD HH:mm:ss');
     }
 
     if(this.state.id) {
@@ -243,7 +259,6 @@ class RecipeForm extends Component {
       },
       withCredentials: true
     }).then(response => {
-        console.log("Respuesta API",response)
         if (this.state.img) {
           this.imageRef.current.dropzone.removeAllFiles();
         }
@@ -256,9 +271,9 @@ class RecipeForm extends Component {
           servings: "",
           img: "",
           img_url: "",
-          published_on: "",
+          published_on: moment("1970-01-01").format('YYYY-MM-DD HH:mm:ss'),
           publish_status: "draft",
-          cat_name: "starters",
+          cat_name: "",
           user_id: this.props.currentUser.users_id,
           ingredientsList: [],
           ingredient: "",
@@ -368,10 +383,18 @@ class RecipeForm extends Component {
               value={this.state.cat_name}
               className='select-element'
             >
-              <option value="starters">Starters</option>
-              <option value="main courses">Main Courses</option>
-              <option value="second courses">Second Courses</option>
-              <option value="desserts">Desserts</option>
+            {
+              this.state.categories.map(category => (
+                <option
+                  key={category.categories_id}
+                  className="select-option"
+                  value={category.categories_name}
+                >
+                  {category.categories_name}
+                </option>
+              ))
+            }
+              
             </select>
             
             <div className="image-uploaders">
@@ -387,7 +410,7 @@ class RecipeForm extends Component {
                 </div>
               ):(
                 <DropzoneComponent
-                  ref={this.thumbRef}
+                  ref={this.imageRef}
                   config={this.componentConfig()}
                   djsConfig={this.djsConfig()}
                   eventHandlers={this.handleImageDrop()}
@@ -401,7 +424,7 @@ class RecipeForm extends Component {
                 <input
                   type="radio"
                   checked={this.state.publish_status == 'draft'}
-                  name="publish"
+                  name="publish_status"
                   value="draft"
                   id="draft"
                   onChange={this.handleChange}

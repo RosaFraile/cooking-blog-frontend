@@ -30,9 +30,15 @@ class Login extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
+    this.props.clearErrorText();
     this.props.login(this.state, () => {
       this.props.history.push("/");
-    });
+    })
+    /*
+    this.setState ({
+      errorText: this.props.errorText
+    }) 
+    */
   }
 
   render() {
@@ -65,7 +71,7 @@ class Login extends Component {
               onChange={this.handleChange}/>
             <button type="submit">Login</button>
           </form>
-          <p className='errMsg'>{this.state.errorText}</p>
+          <p className='errMsg'>{this.props.errorText}</p>
           <p>Don't you have an account? <span><Link to="/register" className="link">Register</Link></span></p>
         </div>
       </div>
@@ -73,4 +79,12 @@ class Login extends Component {
   } 
 }
 
-export default connect(null, actions)(Login);
+function mapStateToProps(state) {
+  return {
+      errorText: state.user.errorText
+  }
+}
+
+export default connect(mapStateToProps, actions)(Login);
+
+// export default connect(null, actions)(Login);

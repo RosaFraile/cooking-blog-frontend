@@ -1,6 +1,8 @@
 import { 
     LOGIN,
-    LOGOUT
+    LOGOUT,
+    FETCH_FAILURE,
+    CLEAR_FAILURE
 } from '../actions/types';
 
 const INIT_STATE = {
@@ -21,6 +23,18 @@ export default function(state=INIT_STATE, action) {
                 ...state,
                 currentUser: null
             };
+        case FETCH_FAILURE:
+            console.log("Error from authReducer", action.payload)
+            return {
+                ...state,
+                errorText: action.payload
+            }
+        case CLEAR_FAILURE:
+            console.log("Clear failure", action.payload)
+            return {
+                ...state,
+                errorText: action.payload
+            }
         default:
             return state;
     }

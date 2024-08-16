@@ -34,7 +34,6 @@ class Register extends Component {
     axios.post("http://localhost:5000/auth/register", this.state, {
       withCredentials: true
     }).then(response => {
-      console.log(response);
       if(response.data !== "200") {
         this.setState({
           errorText: response.data

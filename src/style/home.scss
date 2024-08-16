@@ -91,6 +91,29 @@
                             display: flex;
                             gap: 30px;
                         }
+
+                        .author-date {
+                            display: flex;
+                            gap: 20px;
+
+                            p {
+                                font-size: 12px;
+                                line-height: 22px;
+                                letter-spacing: 0px;
+        
+                                span {
+                                    font-weight: 700;
+                                }
+                            }
+
+                            .date {
+                                p {
+                                    border-left: 2px solid $medium-grey;
+                                    color: $medium-grey;
+                                    padding-left: 10px;
+                                }
+                            }
+                        }
                     }
                 
                     @media screen and (max-width: 700px) {

@@ -1,16 +1,21 @@
 import {
     LOGIN,
-    LOGOUT
+    LOGOUT,
+    FETCH_FAILURE,
+    CLEAR_FAILURE
 } from './types';
 
 import axios from 'axios';
 
 export function login(user, callback) {
     return function(dispatch) {
+        console.log(user)
         axios.post('http://localhost:5000/auth/login', user, { withCredentials: true })
             .then(response => {
                 if(response.data === '404' || response.data === '400') {
-                    console.log("Wrong username or password");
+                    dispatch({
+                        type: FETCH_FAILURE,
+                        payload: "Wrong username or password" });
                 } else {
                     localStorage.setItem("user", JSON.stringify(response.data))
                     dispatch({
@@ -24,7 +29,9 @@ export function login(user, callback) {
                 }
             })
             .catch(error => {
-                console.log("login error", error);
+                dispatch({
+                    type: FETCH_FAILURE,
+                    payload: error.message });
         })
     }
 }
@@ -41,7 +48,18 @@ export function logout() {
                 })
             })
             .catch(error => {
-                console.log("logout error", error)
+                dispatch({
+                    type: FETCH_FAILURE,
+                    payload: error.message });
             })
+    }
+}
+
+export function clearErrorText() {
+    return function(dispatch) {
+        dispatch({
+            type: CLEAR_FAILURE,
+            payload: ""
+        })
     }
 }

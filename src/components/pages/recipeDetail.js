@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import moment from 'moment';
-import ReactHtmlParser from "react-html-parser";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { connect } from 'react-redux';
 
@@ -108,7 +107,14 @@ class RecipeDetail extends Component {
                 <p>By <span>{this.state.recipeItem.users_username}</span></p>
               </div>
               <div className='date'>
-                <p>Published on {moment(this.state.recipeItem.recipes_published_on).format("MMMM DD, YYYY")}</p>
+                {
+                  this.state.recipeItem.recipes_publish_status === "published" ?
+                  (
+                    <p>Published on {moment(this.state.recipeItem.recipes_published_on).format("MMMM DD, YYYY")}</p>
+                  ):(
+                    <p>Draft</p>
+                  )
+                }
               </div>
               {
                 (this.props.currentUser && this.props.currentUser.users_username === this.state.recipeItem.users_username) ?

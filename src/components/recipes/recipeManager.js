@@ -37,7 +37,6 @@ class RecipeManager extends Component {
   }
 
   handleDeleteClick(recipeItem) {
-    console.log(recipeItem);
     axios
       .delete(`http://localhost:5000/recipes/${recipeItem.recipes_id}`,
         { withCredentials: true }
