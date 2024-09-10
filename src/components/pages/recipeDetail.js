@@ -9,6 +9,7 @@ import * as actions from '../../actions';
 import Navbar from '../navigation/navbar';
 import Footer from '../footer/footer';
 import RecipeForm from '../recipes/recipeForm';
+import MessageModal from '../modals/messageModal';
 
 class RecipeDetail extends Component {
   constructor(props) {
@@ -19,7 +20,9 @@ class RecipeDetail extends Component {
       recipeItem: {},
       ingredients: [],
       directions: [],
-      editMode: false
+      editMode: false,
+      msgModalIsOpen: false,
+      message: ""
     }
     
     this.getRecipeItem = this.getRecipeItem.bind(this);
@@ -27,15 +30,29 @@ class RecipeDetail extends Component {
     this.handleEditClick = this.handleEditClick.bind(this);
     this.handleImageDelete = this.handleImageDelete.bind(this);
     this.handleUpdateFormSubmission = this.handleUpdateFormSubmission.bind(this);
+    this.handleModalClose = this.handleModalClose.bind(this);
+    this.handleError = this.handleError.bind(this);
+  }
+
+  handleModalClose() {
+    this.setState({
+      msgModalIsOpen: false
+    })
+  }
+
+  handleError(errorMessage) {
+    this.setState({
+      msgModalIsOpen: true,
+      message: errorMessage
+    })
   }
 
   handleDeleteClick() {
     axios.delete(`http://localhost:5000/recipes/${this.state.currentId}`, { withCredentials:true })
     .then(response => {
-      console.log(response)
       this.props.history.push("/");
     }).catch(error => {
-      console.log("handleDelete error", error)
+      this.handleError(`Error deleting the selected recipe from the Database - ${error}`);
     })
   }
 
@@ -64,7 +81,6 @@ class RecipeDetail extends Component {
     axios
       .get(`http://localhost:5000/recipes/${this.state.currentId}`)
       .then(response => {
-        console.log("Response API", response.data[0])
         const ingredients = response.data[0].recipes_ingredients.split("|")
         const directions = response.data[0].recipes_directions.split("|")
         this.setState({
@@ -72,15 +88,20 @@ class RecipeDetail extends Component {
           ingredients,
           directions
         })
-        console.log("Recipe item", this.state.recipeItem)
       }).catch(error => {
-        console.log(error);
+        this.handleError(`Error getting the selected recipe from the Database - ${error}`);
       })
   }
 
   componentDidMount() {
     this.getRecipeItem();
   }
+
+  
+  componentDidUpdate() {
+    this.getRecipeItem();
+  }
+  
 
   render() {
     const contentManager = () => {
@@ -117,7 +138,7 @@ class RecipeDetail extends Component {
                 }
               </div>
               {
-                (this.props.currentUser && this.props.currentUser.users_username === this.state.recipeItem.users_username) ?
+                (this.props.currentUser && (this.props.currentUser.users_role === "admin" || this.props.currentUser.users_username === this.state.recipeItem.users_username)) ?
                 (<div className="edit-delete">
                   <div onClick={this.handleEditClick} className='edit'>
                     <FontAwesomeIcon icon="edit" />
@@ -145,7 +166,10 @@ class RecipeDetail extends Component {
                 <div>Servings</div>
                 <div>{this.state.recipeItem.recipes_servings}</div>
               </div>
-              
+              <div className='difficulty'>
+                <div>Difficulty</div>
+                <div className='difficulty-content'>{this.state.recipeItem.recipes_difficulty}</div>
+              </div>
             </div>
             <div className='ingredients'>
               <h2>Ingredients</h2>
@@ -174,6 +198,11 @@ class RecipeDetail extends Component {
 
     return (
       <div className='recipe-detail-page'>
+        <MessageModal
+          modalIsOpen={this.state.msgModalIsOpen}
+          message={this.state.message} 
+          handleModalClose={this.handleModalClose}
+        />
         <Navbar />
         {contentManager()}
         <Footer />

@@ -21,6 +21,7 @@ const RecipeItem = (props) => {
         <div className="time-servings">
           <div><FontAwesomeIcon icon="clock" /> {props.recipeItem.recipes_prep_time}</div>
           <div>Servings: {props.recipeItem.recipes_servings}</div>
+          <div>Difficulty: <span className='difficulty'>{props.recipeItem.recipes_difficulty}</span></div>
         </div>
         <div className='author-date'>
           <div className='author'>By {props.recipeItem.users_username}</div>

@@ -14,20 +14,14 @@ export default class MessageModal extends Component {
                 right: "auto",
                 marginRight: "-50%",
                 transform: "translate(-50%, -50%)",
-                width: "800px"
+                width: "60vw",
+                height: "60vh"
             },
             overlay: {
                 backgroundColor: "rgba(1, 1, 1, 0.75)"
             }
         }
     }
-
-    
-    handleCloseModal() {
-        this.setState({
-          blogModalIsOpen: false
-        })
-      }
 
     render() {
         return (
@@ -37,7 +31,7 @@ export default class MessageModal extends Component {
                     this.props.handleModalClose();
                 }}
                 isOpen={this.props.modalIsOpen} >
-                <h1>{this.pops.message}</h1>
+                <h1>{this.props.message}</h1>
             </ReactModal>
         )
     }

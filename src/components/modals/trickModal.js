@@ -16,7 +16,8 @@ export default class TrickModal extends Component {
                 right: "auto",
                 marginRight: "-50%",
                 transform: "translate(-50%, -50%)",
-                width: "800px"
+                width: "90vw",
+                height: "90vh"
             },
             overlay: {
                 backgroundColor: "rgba(1, 1, 1, 0.75)"
@@ -27,17 +28,8 @@ export default class TrickModal extends Component {
     }
 
     handleUpdateFormSubmission() {
-        this.setState({
-            trickModalIsOpen: false
-        })
         this.props.handleUpdateFormSubmission();
     }
-
-    handleCloseModal() {
-        this.setState({
-          trickModalIsOpen: false
-        })
-      }
 
     render() {
         return (
@@ -46,7 +38,8 @@ export default class TrickModal extends Component {
                 onRequestClose={() => {
                     this.props.handleModalClose();
                 }}
-                isOpen={this.props.modalIsOpen} >
+                isOpen={this.props.modalIsOpen}
+            >
                 <TrickForm
                     handleUpdateFormSubmission={this.handleUpdateFormSubmission}
                     editMode={this.props.editMode}

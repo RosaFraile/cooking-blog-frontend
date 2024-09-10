@@ -13,7 +13,6 @@ export default function(state=INIT_STATE, action) {
     switch (action.type) {
         case LOGIN:
             const currentUser = action.payload
-            console.log("User", currentUser)
             return {
                 ...state,
                 currentUser
@@ -24,7 +23,6 @@ export default function(state=INIT_STATE, action) {
                 currentUser: null
             };
         case FETCH_FAILURE:
-            console.log("Error from authReducer", action.payload)
             return {
                 ...state,
                 errorText: action.payload

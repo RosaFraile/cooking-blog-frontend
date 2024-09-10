@@ -56,6 +56,12 @@
                     background-color: white;
                 }
             }
+
+            .user {
+                .username {
+                    margin-left: 5px;
+                }
+            }
         }
     }
 
@@ -151,6 +157,11 @@
                 background-color: $offwhite;
                 padding: 0 20px;
                 gap: 0px;
+
+                .manager-group {
+                    flex-direction: column;
+                    gap: 0;
+                }
 
                 .navbar-link {
                     width: 100%;

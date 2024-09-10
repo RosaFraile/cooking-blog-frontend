@@ -34,11 +34,6 @@ class Login extends Component {
     this.props.login(this.state, () => {
       this.props.history.push("/");
     })
-    /*
-    this.setState ({
-      errorText: this.props.errorText
-    }) 
-    */
   }
 
   render() {
@@ -86,5 +81,3 @@ function mapStateToProps(state) {
 }
 
 export default connect(mapStateToProps, actions)(Login);
-
-// export default connect(null, actions)(Login);

@@ -121,7 +121,8 @@ class TrickForm extends Component {
         else if (this.state.editMode) {
           this.props.handleEditFormSubmission()
         } else {
-            this.props.handleSuccessfulFormSubmission(response.data[0]);
+          console.log(response.data[0])
+          this.props.handleSuccessfulFormSubmission(response.data[0]);
         }
       })
       .catch(error => {

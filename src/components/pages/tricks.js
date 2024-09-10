@@ -9,6 +9,7 @@ import Navbar from '../navigation/navbar';
 import Footer from '../footer/footer';
 import TrickItem from '../tricks/trickItem';
 import TrickModal from '../modals/trickModal';
+import MessageModal from '../modals/messageModal';
 
 class Tricks extends Component {
   constructor(props) {
@@ -18,14 +19,31 @@ class Tricks extends Component {
       tricks: [],
       trickToEdit: {},
       editMode: false,
-      trickModalIsOpen: false
+      trickModalIsOpen: false,
+      msgModalIsOpen: false,
+      message: ""
     }
 
     this.getTricks = this.getTricks.bind(this);
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
     this.handleEditClick = this.handleEditClick.bind(this);
-    this.handleModalClose = this.handleModalClose.bind(this);
+    this.handleTrickModalClose = this.handleTrickModalClose.bind(this);
     this.handleUpdateFormSubmission = this.handleUpdateFormSubmission.bind(this);
+    this.handleMessageModalClose = this.handleMessageModalClose.bind(this);
+    this.handleError = this.handleError.bind(this);
+  }
+
+  handleError(errorMessage) {
+    this.setState({
+      msgModalIsOpen: true,
+      message: errorMessage
+    })
+  }
+
+  handleMessageModalClose() {
+    this.setState({
+      msgModalIsOpen: false
+    })
   }
   
   handleDeleteClick(trick) {
@@ -38,7 +56,7 @@ class Tricks extends Component {
         })
         return response.data;
       }).catch(error => {
-        console.log("handleDeleteClick trick error", error);
+        this.handleError(`Error deleting the selected trick ${errorMessage}`);
       })
   }
 
@@ -49,7 +67,8 @@ class Tricks extends Component {
       trickModalIsOpen: true
     })
   }
-  handleModalClose() {
+
+  handleTrickModalClose() {
     this.setState({
       trickModalIsOpen: false
     })
@@ -62,7 +81,7 @@ class Tricks extends Component {
           tricks: response.data
         })
       }).catch(error => {
-        console.log(error);
+        this.handleError(`Error loading tricks from the Database ${error}`);
       })
   }
 
@@ -80,9 +99,14 @@ class Tricks extends Component {
   render() {
     return (
       <div className='tricks-container'>
+        <MessageModal
+          modalIsOpen={this.state.msgModalIsOpen}
+          message={this.state.message} 
+          handleModalClose={this.handleMessageModalClose}
+        />
         <TrickModal
           modalIsOpen={this.state.trickModalIsOpen} 
-          handleModalClose={this.handleModalClose}
+          handleModalClose={this.handleTrickModalClose}
           handleUpdateFormSubmission={this.handleUpdateFormSubmission}
           trickToEdit={this.state.trickToEdit}
           editMode={this.state.editMode}
@@ -93,20 +117,20 @@ class Tricks extends Component {
             {this.state.tricks.map(trick => (
               <div className="trickItem" key={trick.tricks_id}>
                 
-                {(this.props.currentUser && this.props.currentUser.users_username === trick.users_username) ?
+                {(this.props.currentUser && (this.props.currentUser.users_role === "admin" || this.props.currentUser.users_username === trick.users_username)) ?
                   (<div className="edit-delete">
-                  <div
-                    onClick={() => {this.handleEditClick(trick)}}
-                    className='edit'
-                  >
-                      <FontAwesomeIcon icon="edit" />
-                  </div>
-                  <div 
-                    onClick={() => {this.handleDeleteClick(trick)}}
-                    className='delete'
-                  >
-                    <FontAwesomeIcon icon="trash-can" />
-                  </div>
+                    <div
+                      onClick={() => {this.handleEditClick(trick)}}
+                      className='edit'
+                    >
+                        <FontAwesomeIcon icon="edit" />
+                    </div>
+                    <div 
+                      onClick={() => {this.handleDeleteClick(trick)}}
+                      className='delete'
+                    >
+                      <FontAwesomeIcon icon="trash-can" />
+                    </div>
                   </div>
                   ):(
                   null

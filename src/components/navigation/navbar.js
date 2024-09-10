@@ -1,26 +1,41 @@
 import React, { Component } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from "axios";
-import { connect } from 'react-redux';
 import Dropdown from '../dropdown/dropdown';
 import DropdownItem from '../dropdown/dropdownItem';
+import { connect } from 'react-redux';
 
 import * as actions from '../../actions';
 
 import Logo from '../../../static/assets/images/cook-logo.png';
-
+import MessageModal from '../modals/messageModal';
 
 class Navbar extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {
+            msgModalIsOpen: false,
+            message: ""
+        }
+
         this.handleHamburgerMenu = this.handleHamburgerMenu.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
+        this.handleModalClose = this.handleModalClose.bind(this);
     }
 
     componentDidMount() {
         document.getElementById('toggle').addEventListener('click', this.handleHamburgerMenu);
+    }
+    
+    componentDidUpdate() {
+        if (this.props.errorText) {
+            this.setState({
+                msgModalIsOpen: true,
+                message: `We couldn't connect with the server: ${this.props.errorText}`
+            })
+            this.props.clearErrorText();
+        }
     }
 
     componentWillUnmount() {
@@ -35,10 +50,21 @@ class Navbar extends Component {
         event.preventDefault();
         this.props.logout();
     }
+
+    handleModalClose() {
+        this.setState({
+          msgModalIsOpen: false
+        })
+    }
     
     render() {
         return (
             <div className='navbar'>
+                <MessageModal
+                    modalIsOpen={this.state.msgModalIsOpen} 
+                    handleModalClose={this.handleModalClose}
+                    message={this.state.message}
+                />
                 <div className='top-navbar'>
                     <div className='left-column'>
                         <button className="toggle" id="toggle">
@@ -53,26 +79,26 @@ class Navbar extends Component {
                     <div className='right-column'>
                         <div>
                             {this.props.currentUser ?
-                                (   <Dropdown
-                                        buttonText={<FontAwesomeIcon className="write" icon="circle-plus" />}
-                                        content={(<div>
-                                            <Link className="link" to="/recipeManager">
-                                                <DropdownItem>Recipe</DropdownItem>
-                                            </Link>
-                                            <Link className="link" to="/trickManager">
-                                                <DropdownItem>Trick</DropdownItem>
-                                            </Link>
-                                        </div>
-                                        )}
-                                    ></Dropdown>
+                                (<Dropdown
+                                    buttonText={<FontAwesomeIcon className="write" icon="circle-plus" />}
+                                    content={(<div>
+                                        <Link className="link" to="/recipeManager">
+                                            <DropdownItem>Recipe</DropdownItem>
+                                        </Link>
+                                        <Link className="link" to="/trickManager">
+                                            <DropdownItem>Trick</DropdownItem>
+                                        </Link>
+                                    </div>
+                                    )}
+                                 ></Dropdown>
                                 ):(
-                                    null
+                                   null
                                 )
                             }    
                         </div>
-                    <div>
-                        <FontAwesomeIcon icon="user" /> {this.props.currentUser ?  this.props.currentUser.users_username : null}
-                    </div>
+                        <div className='user'>
+                            <FontAwesomeIcon icon="user" /> <span className='username'>{this.props.currentUser ?  this.props.currentUser.users_username : null}</span>
+                        </div>
                         <div>
                             {this.props.currentUser ?
                                 (
@@ -81,14 +107,16 @@ class Navbar extends Component {
                                     <Link to="/login" className='logStatus link'>Login</Link>
                                 )
                             }
-                        </div>
-                        
+                        </div>    
                     </div>
                 </div>
                 <div className='bottom-navbar' id='links-list'>
                     <div className='navbar-links'>
                         <NavLink className="navbar-link link" exact to="/" activeClassName="nav-link-active">
                             <h6>RECIPES</h6>
+                        </NavLink>
+                        <NavLink className="navbar-link link" exact to="/beginners" activeClassName="nav-link-active">
+                            <h6>FOR BEGINNERS</h6>
                         </NavLink>
                         <NavLink className="navbar-link link" to="/tricks" activeClassName="nav-link-active">
                             <h6>COOKING TRICKS</h6>
@@ -117,7 +145,8 @@ class Navbar extends Component {
 
 function mapStateToProps(state) {
     return {
-        currentUser: state.user.currentUser
+        currentUser: state.user.currentUser,
+        errorText: state.user.errorText
     }
 }
 

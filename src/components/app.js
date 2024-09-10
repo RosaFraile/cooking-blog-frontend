@@ -14,6 +14,7 @@ import Login from "./pages/login";
 import RecipeManager from "./recipes/recipeManager";
 import TrickManager from "./tricks/trickManager";
 import RecipeDetail from "./pages/recipeDetail";
+import Beginners from "./pages/beginners";
 import Tricks from "./pages/tricks";
 import About from "./pages/about"
 import NoMatch from "./pages/noMatch";
@@ -46,6 +47,7 @@ class App extends Component {
               <Route path="/register" component={Register} />
               <Route path="/login" component={Login}/>
               <Route path="/recipe/:id" component={RecipeDetail}/>
+              <Route path="/beginners" component={Beginners}/>
               <Route path="/tricks" component={Tricks}/>
               <Route path="/about" component={About} />
               {this.props.currentUser ? this.authorizedPages() : null}

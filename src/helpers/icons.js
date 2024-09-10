@@ -11,7 +11,9 @@ import {
   faTrashCan,
   faUser,
   faChevronDown,
-  faChevronUp
+  faChevronUp,
+  faChevronLeft,
+  faChevronRight
 } from "@fortawesome/free-solid-svg-icons";
 
 const Icons = () => {
@@ -27,7 +29,9 @@ const Icons = () => {
       faTrashCan,
       faUser,
       faChevronDown,
-      faChevronUp
+      faChevronUp,
+      faChevronLeft,
+      faChevronRight
     );
 };
 

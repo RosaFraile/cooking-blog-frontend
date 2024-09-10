@@ -12,7 +12,7 @@
         margin-bottom: 30px;
         
         .home {
-            max-width: 1000px;
+            width: 80%;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -20,8 +20,8 @@
             .categories {
                 display: flex;
                 justify-content: center;
-                flex-wrap: nowrap;
-                gap: 20px;
+                flex-wrap: wrap;
+                gap: 15px;
 
                 button {
                     padding: 5px 10px;
@@ -37,6 +37,22 @@
                         text-transform: uppercase;
                     }
                 }
+
+                @media screen and (max-width: 700px) {
+                    gap: 10px;
+                    
+                    button {
+                        padding: 3px 8px;
+                        font-size: 0.75rem;
+                    }
+                }
+            }
+
+            .categories-title {
+                text-transform: uppercase;
+                font-weight: 900;
+                text-align: center;
+                margin-top: 30px;
             }
 
             .recipes {
@@ -60,8 +76,8 @@
                         border-radius: 25px;
                 
                         img {
-                            width: 400px;
-                            max-height: 400px;
+                            width: 100%;
+                            height: auto;
                             object-fit: cover;
                             border-radius: 25px;
                         }
@@ -90,6 +106,10 @@
                         .time-servings {
                             display: flex;
                             gap: 30px;
+
+                            .difficulty {
+                                text-transform: uppercase;
+                            }
                         }
 
                         .author-date {
@@ -108,8 +128,8 @@
 
                             .date {
                                 p {
-                                    border-left: 2px solid $medium-grey;
-                                    color: $medium-grey;
+                                    border-left: 1px solid $dark-grey;
+                                    color: $dark-grey;
                                     padding-left: 10px;
                                 }
                             }
@@ -129,15 +149,14 @@
                         }
                 
                         .img {
-                            width: 100%;
                             padding-bottom: 0px;
                             padding-left: 0px;
                             background-color: white;
+
                         }
                 
                         .content {
                             h6 {
-                                font-family: 'Dancing Script', cursive;
                                 font-size: 20px;
                                 text-align: center;
                             }
@@ -146,6 +165,26 @@
                                 font-size: 20px;
                                 line-height: 28px;
                                 text-align: center;
+                            }
+
+                            .time-servings {
+                                justify-content: center;
+                                gap: 20px;
+                                font-size: 0.75rem;
+                            }
+
+                            .author-date {
+                                gap: 15px;
+                                justify-content: center;
+
+                                .author {
+                                    font-size: 0.75rem;
+                                }
+    
+                                p {
+                                    font-size: 10px;
+                                    line-height: 20px;
+                                }
                             }
                         }
                     }

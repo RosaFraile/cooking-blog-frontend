@@ -30,19 +30,22 @@ class Register extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    
     axios.post("http://localhost:5000/auth/register", this.state, {
       withCredentials: true
     }).then(response => {
-      if(response.data !== "200") {
-        this.setState({
-          errorText: response.data
-        })
-      } else {
-        this.props.history.push("/login");
+      console.log("response.ok", response.ok)
+      if(!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+     
+      this.props.history.push("/login");
     }).catch(error => {
-      console.log("handleSubmit error", error);
+      if (error.response) {
+        // error.response.status: 409
+        this.setState({
+          errorText: error.response.data.error
+        })
+      }
     })
   }
 

@@ -10,6 +10,8 @@ import * as actions from '../../actions';
 import "../../../node_modules/react-dropzone-component/styles/filepicker.css";
 import "../../../node_modules/dropzone/dist/min/dropzone.min.css";
 
+import MessageModal from '../modals/messageModal';
+
 class RecipeForm extends Component {
   constructor(props) {
     super(props);
@@ -22,6 +24,7 @@ class RecipeForm extends Component {
       servings: "",
       img: "",
       img_url: "",
+      difficulty: "easy",
       published_on: moment("1970-01-01").format('YYYY-MM-DD HH:mm:ss'),
       publish_status: "draft",
       cat_name: "",
@@ -33,7 +36,9 @@ class RecipeForm extends Component {
       editMode: false,
       apiUrl: "http://localhost:5000/recipes",
       apiAction: "post",
-      categories: []
+      categories: [],
+      msgModalIsOpen: false,
+      message: ""
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -49,6 +54,22 @@ class RecipeForm extends Component {
     
     this.handleSubmit = this.handleSubmit.bind(this);
     this.deleteImage = this.deleteImage.bind(this);
+
+    this.handleModalClose = this.handleModalClose.bind(this);
+    this.handleError = this.handleError.bind(this);
+  }
+
+  handleModalClose() {
+    this.setState({
+      msgModalIsOpen: false
+    })
+  }
+
+  handleError(errorMessage) {
+    this.setState({
+      msgModalIsOpen: true,
+      message: errorMessage
+    })
   }
 
   mapCategoriesToState(categories) {
@@ -61,10 +82,9 @@ class RecipeForm extends Component {
   getCategories() {
     axios.get("http://localhost:5000/categories")
       .then(response => {
-        console.log(response.data);
         this.mapCategoriesToState(response.data);
       }).catch(error => {
-        console.log("getCategories error", error)
+        this.handleError(`Error getting the categories from the Database - ${error}`);
       })
   }
 
@@ -77,7 +97,7 @@ class RecipeForm extends Component {
         img_url: ""
       })
     }). catch(error => {
-      console.log("deleteImage error", error);
+      this.handleError(`Error deleting the image - ${error}`);
     });
   }
 
@@ -128,9 +148,10 @@ class RecipeForm extends Component {
         title: this.props.recipeToEdit.recipes_title,
         ingredients: this.props.recipeToEdit.recipes_ingredients,
         directions: this.props.recipeToEdit.recipes_directions,
-        img_url: this.props.recipeToEdit.recipes_img_url,
         prep_time: this.props.recipeToEdit.recipes_prep_time,
         servings: this.props.recipeToEdit.recipes_servings,
+        img_url: this.props.recipeToEdit.recipes_img_url,
+        difficulty: this.props.recipeToEdit.recipes_difficulty,
         published_on: this.props.recipeToEdit.recipes_published_on,
         publish_status: this.props.recipeToEdit.recipes_publish_status,
         cat_name: this.props.recipeToEdit.categories_name,
@@ -153,6 +174,7 @@ class RecipeForm extends Component {
         recipes_directions,
         recipes_id,
         recipes_img_url,
+        recipes_difficulty,
         recipes_ingredients,
         recipes_prep_time,
         recipes_publish_status,
@@ -170,9 +192,10 @@ class RecipeForm extends Component {
         title: recipes_title,
         ingredients: recipes_ingredients,
         directions: recipes_directions,
-        img_url: recipes_img_url,
         prep_time: recipes_prep_time,
         servings: recipes_servings,
+        img_url: recipes_img_url,
+        difficulty: recipes_difficulty,
         published_on: recipes_published_on,
         publish_status: recipes_publish_status,
         cat_name: categories_name,
@@ -223,6 +246,7 @@ class RecipeForm extends Component {
     formData.append("title", this.state.title);
     formData.append("prep_time", this.state.prep_time);
     formData.append("servings", this.state.servings);
+    formData.append("difficulty", this.state.difficulty);
     formData.append("cat_name", this.state.cat_name);
     formData.append("user_id", this.state.user_id);
     formData.append("published_on", this.state.published_on);
@@ -250,59 +274,82 @@ class RecipeForm extends Component {
   }
 
   handleSubmit(event) {
-    axios({
-      method: this.state.apiAction,
-      url: this.state.apiUrl,
-      data: this.buildForm(),
-      headers: {
-        'content-type': 'multipart/form-data'
-      },
-      withCredentials: true
-    }).then(response => {
-        if (this.state.img) {
-          this.imageRef.current.dropzone.removeAllFiles();
-        }
-
-        this.setState({
-          title: "",
-          ingredients:"",
-          directions:"",
-          prep_time: "",
-          servings: "",
-          img: "",
-          img_url: "",
-          published_on: moment("1970-01-01").format('YYYY-MM-DD HH:mm:ss'),
-          publish_status: "draft",
-          cat_name: "",
-          user_id: this.props.currentUser.users_id,
-          ingredientsList: [],
-          ingredient: "",
-          directionsList: [],
-          direction: "",
-          apiUrl: "http://localhost:5000/recipes",
-          apiAction: "post"
-        });
-
-  
-        if (this.props.editMode) {
-          this.props.handleUpdateFormSubmission(response.data[0]);
-        } else if (this.state.editMode) {
-          this.props.handleEditFormSubmission()
+    if (isNaN(this.state.servings)) {
+      alert("Servings is not a number!!");
+    } else if (this.state.ingredientsList.length === 0 || this.state.directionsList.length === 0) {
+      alert("At least one ingredient and one direction is needed!!");
+    } else if (!this.state.img && !this.state.img_url) {
+      alert("An image is needed!!")
+    } else {
+      axios({
+        method: this.state.apiAction,
+        url: this.state.apiUrl,
+        data: this.buildForm(),
+        headers: {
+          'content-type': 'multipart/form-data'
+        },
+        withCredentials: true
+      }).then(response => {
+        console.log(response.data);
+        if (response.data === "401" || response.data === "403") {
+          this.handleError("Authentication error. Is recommended to logout and login again.");
+          this.props.logout();
+         // this.props.history.push("/");
+        } else if (response.data === "404") {
+          this.handleError("Cagtegory not found");
+        } else if (response.data === "Please, load an image!!!") {
+          this.handleError("It's compulsory to load an image");
         } else {
-          this.props.handleSuccessfulFormSubmission(response.data[0]);
-        }
+          if (this.state.img) {
+            this.imageRef.current.dropzone.removeAllFiles();
+          }
   
+          this.setState({
+            title: "",
+            ingredients:"",
+            directions:"",
+            prep_time: "",
+            servings: "",
+            img: "",
+            img_url: "",
+            difficulty: "easy",
+            published_on: moment("1970-01-01").format('YYYY-MM-DD HH:mm:ss'),
+            publish_status: "draft",
+            cat_name: "",
+            user_id: this.props.currentUser.users_id,
+            ingredientsList: [],
+            ingredient: "",
+            directionsList: [],
+            direction: "",
+            apiUrl: "http://localhost:5000/recipes",
+            apiAction: "post"
+          });
+    
+          if (this.props.editMode) {
+            this.props.handleUpdateFormSubmission(response.data[0]);
+          } else if (this.state.editMode) {
+            this.props.handleEditFormSubmission()
+          } else {
+            this.props.handleSuccessfulFormSubmission(response.data[0]);
+          }
+        }
       })
       .catch(error => {
         console.log("handleSubmit for write recipe error", error);
       });
 
+    }
     event.preventDefault();
   }
 
   render() {
     return (
       <div className='write-post-wrapper'>
+        <MessageModal
+          modalIsOpen={this.state.msgModalIsOpen}
+          message={this.state.message} 
+          handleModalClose={this.handleModalClose}
+        />
         <div className='write-post-container'>
           <form onSubmit={this.handleSubmit}>
             <input required
@@ -394,7 +441,31 @@ class RecipeForm extends Component {
                 </option>
               ))
             }
-              
+            </select>
+            <select
+              onChange={this.handleChange}
+              name='difficulty'
+              value={this.state.difficulty}
+              className='select-element'
+            >
+              <option
+                className="select-option"
+                value="easy"
+              >
+                Easy
+              </option>
+              <option
+                className="select-option"
+                value="medium"
+              >
+                Medium
+              </option>
+              <option
+                className="select-option"
+                value="hard"
+              >
+                Hard
+              </option>
             </select>
             
             <div className="image-uploaders">
