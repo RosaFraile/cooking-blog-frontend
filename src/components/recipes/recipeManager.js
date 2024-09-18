@@ -8,6 +8,7 @@ import Navbar from '../navigation/navbar';
 import Footer from '../footer/footer';
 import RecipeSidebarList from '../recipes/recipeSidebarList'
 import RecipeForm from './recipeForm';
+import MessageModal from '../modals/messageModal';
 
 class RecipeManager extends Component {
   constructor(props) {
@@ -17,7 +18,9 @@ class RecipeManager extends Component {
       recipeItems: [],
       recipeToEdit: {},
       ingredients: [],
-      directions: []
+      directions: [],
+      msgModalIsOpen: false,
+      message: ""
     };
 
     this.handleSuccessfulFormSubmission = this.handleSuccessfulFormSubmission.bind(this);
@@ -26,6 +29,21 @@ class RecipeManager extends Component {
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
     this.handleEditClick = this.handleEditClick.bind(this);
     this.clearRecipeToEdit = this.clearRecipeToEdit.bind(this);
+    this.handleModalClose = this.handleModalClose.bind(this);
+    this.handleError = this.handleError.bind(this);
+  }
+
+  handleModalClose() {
+    this.setState({
+      msgModalIsOpen: false
+    })
+  }
+
+  handleError(errorMessage) {
+    this.setState({
+      msgModalIsOpen: true,
+      message: errorMessage
+    })
   }
 
   clearRecipeToEdit() {
@@ -48,7 +66,7 @@ class RecipeManager extends Component {
         })
         return response.data;
       }).catch(error => {
-        console.log("handleDeleteClick error", error);
+        this.handleError(`Error deleting the recipe from the Database - ${error}`);
       })
   }
 
@@ -75,19 +93,18 @@ class RecipeManager extends Component {
   }
 
   handleFormSubmissionError(error) {
-    console.log("Error in handleFormSubmissionError", error)
+    this.handleError(`An error occurred during the form submission - ${error}`);
   }
 
   getRecipeItems() {
     axios.get(`http://localhost:5000/recipes?user=${this.props.currentUser.users_id}`, { withCredentials: true})
       .then(response => {
-        console.log(response.data)
         this.setState({ 
           recipeItems: response.data
         })
       })
       .catch(error => {
-        console.log("Error in getRecipeItems", error);
+        this.handleError(`Error getting the recipes from the Database - ${error}`);
       });
   }
 
@@ -98,6 +115,11 @@ class RecipeManager extends Component {
   render() {
     return (
       <div>
+        <MessageModal
+          modalIsOpen={this.state.msgModalIsOpen}
+          message={this.state.message} 
+          handleModalClose={this.handleModalClose}
+        />
         <Navbar />
         <div className='recipe-manager-wrapper'>
           <div className='left-column'>

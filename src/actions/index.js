@@ -46,7 +46,6 @@ export function logout() {
             })
             .catch(error => {
                 if (error.response) {
-                    // error.response.status: 400 or 404
                     dispatch({
                         type: FETCH_FAILURE,
                         payload: error.response.data.error

@@ -33,11 +33,10 @@ class Register extends Component {
     axios.post("http://localhost:5000/auth/register", this.state, {
       withCredentials: true
     }).then(response => {
-      console.log("response.ok", response.ok)
       if(!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-     
+      
       this.props.history.push("/login");
     }).catch(error => {
       if (error.response) {

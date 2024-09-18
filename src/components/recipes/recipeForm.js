@@ -38,7 +38,11 @@ class RecipeForm extends Component {
       apiAction: "post",
       categories: [],
       msgModalIsOpen: false,
-      message: ""
+      message: "",
+      servingsError: "",
+      ingredientsError: "",
+      directionsError: "",
+      imgError: ""
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -162,7 +166,11 @@ class RecipeForm extends Component {
         apiUrl: `http://localhost:5000/recipes/${
           this.props.recipeToEdit.recipes_id
         }`,
-        apiAction: "patch"
+        apiAction: "patch",
+        servingsError: "",
+        ingredientsError: "",
+        directionsError: "",
+        imgError: ""
       });
     }
   }
@@ -204,7 +212,11 @@ class RecipeForm extends Component {
         directionsList: this.props.directions,
         editMode: true,
         apiUrl: `http://localhost:5000/recipes/${recipes_id}`,
-        apiAction: "patch"
+        apiAction: "patch",
+        servingsError: "",
+        ingredientsError: "",
+        directionsError: "",
+        imgError: ""
       });
     }
   }
@@ -274,12 +286,46 @@ class RecipeForm extends Component {
   }
 
   handleSubmit(event) {
-    if (isNaN(this.state.servings)) {
-      alert("Servings is not a number!!");
-    } else if (this.state.ingredientsList.length === 0 || this.state.directionsList.length === 0) {
-      alert("At least one ingredient and one direction is needed!!");
-    } else if (!this.state.img && !this.state.img_url) {
-      alert("An image is needed!!")
+    if(isNaN(this.state.servings) || this.state.ingredientsList.length === 0 || this.state.directionsList.length === 0 || (!this.state.img && !this.state.img_url)) {
+      if (isNaN(this.state.servings)) {
+        this.setState({
+          servingsError: "Servings must be a number"
+        })
+      } else {
+        this.setState({
+          servingsError: ""
+        })
+      }
+
+      if (this.state.ingredientsList.length === 0) {
+        this.setState({
+          ingredientsError: "At least one ingredient is needed"
+        })
+      } else {
+        this.setState({
+          ingredientsError: ""
+        })
+      }
+
+      if (this.state.directionsList.length === 0) {
+        this.setState({
+          directionsError: "At least one direction is needed"
+        })
+      } else {
+        this.setState({
+          directionsError: ""
+        })
+      }
+
+      if (!this.state.img && !this.state.img_url) {
+        this.setState({
+          imgError: "An image is needed"
+        })
+      } else {
+        this.setState({
+          imgError: ""
+        })
+      }
     } else {
       axios({
         method: this.state.apiAction,
@@ -290,54 +336,62 @@ class RecipeForm extends Component {
         },
         withCredentials: true
       }).then(response => {
-        console.log(response.data);
-        if (response.data === "401" || response.data === "403") {
-          this.handleError("Authentication error. Is recommended to logout and login again.");
-          this.props.logout();
-         // this.props.history.push("/");
-        } else if (response.data === "404") {
-          this.handleError("Cagtegory not found");
-        } else if (response.data === "Please, load an image!!!") {
-          this.handleError("It's compulsory to load an image");
-        } else {
-          if (this.state.img) {
-            this.imageRef.current.dropzone.removeAllFiles();
-          }
+        
+        if (this.state.img) {
+          this.imageRef.current.dropzone.removeAllFiles();
+        }
   
-          this.setState({
-            title: "",
-            ingredients:"",
-            directions:"",
-            prep_time: "",
-            servings: "",
-            img: "",
-            img_url: "",
-            difficulty: "easy",
-            published_on: moment("1970-01-01").format('YYYY-MM-DD HH:mm:ss'),
-            publish_status: "draft",
-            cat_name: "",
-            user_id: this.props.currentUser.users_id,
-            ingredientsList: [],
-            ingredient: "",
-            directionsList: [],
-            direction: "",
-            apiUrl: "http://localhost:5000/recipes",
-            apiAction: "post"
-          });
+        this.setState({
+          title: "",
+          ingredients:"",
+          directions:"",
+          prep_time: "",
+          servings: "",
+          img: "",
+          img_url: "",
+          difficulty: "easy",
+          published_on: moment("1970-01-01").format('YYYY-MM-DD HH:mm:ss'),
+          publish_status: "draft",
+          cat_name: "",
+          user_id: this.props.currentUser.users_id,
+          ingredientsList: [],
+          ingredient: "",
+          directionsList: [],
+          direction: "",
+          apiUrl: "http://localhost:5000/recipes",
+          apiAction: "post",
+          servingsError: "",
+          ingredientsError: "",
+          directionsError: "",
+          imgError: ""
+        });
     
-          if (this.props.editMode) {
-            this.props.handleUpdateFormSubmission(response.data[0]);
-          } else if (this.state.editMode) {
-            this.props.handleEditFormSubmission()
-          } else {
-            this.props.handleSuccessfulFormSubmission(response.data[0]);
-          }
+        if (this.props.editMode) {
+          this.props.handleUpdateFormSubmission(response.data[0]);
+        } else if (this.state.editMode) {
+          this.props.handleEditFormSubmission()
+        } else {
+          this.props.handleSuccessfulFormSubmission(response.data[0]);
         }
       })
       .catch(error => {
-        console.log("handleSubmit for write recipe error", error);
-      });
-
+        if (error.response) {
+          switch (error.response.status) {
+            case 401:
+            case 403:
+              this.handleError("Authentication error. Is recommended to logout and login again.");
+              break;
+            case 400:
+            case 404:
+              this.handleError(error.response.data.error);
+              break;
+            default:
+              his.handleError("An error occurred while accessing the DataBase");
+          }
+        } else {
+            this.handleError("An error occurred while accessing the DataBase");
+        }
+      }) 
     }
     event.preventDefault();
   }
@@ -373,15 +427,20 @@ class RecipeForm extends Component {
                   ))}
                 </ul>
               </div>
-              <div className='ingredient'>
-                <input
-                  type="text"
-                  name="ingredient"
-                  value={this.state.ingredient}
-                  placeholder='Add Ingredient'
-                  onChange={this.handleChange}
-                />
-                <FontAwesomeIcon onClick={this.handleIngredientAddition} icon="circle-plus" />
+              <div className='ingredient-section'>
+                <div className='error-message'>
+                  {this.state.ingredientsError && <p><FontAwesomeIcon icon="circle-exclamation" /> {this.state.ingredientsError}</p>}
+                </div>
+                <div className='ingredient'>
+                  <input
+                    type="text"
+                    name="ingredient"
+                    value={this.state.ingredient}
+                    placeholder='Add Ingredient'
+                    onChange={this.handleChange}
+                  />
+                  <FontAwesomeIcon onClick={this.handleIngredientAddition} icon="circle-plus" />
+                </div> 
               </div>
             </div>
             <div className='directions-group'>
@@ -398,16 +457,21 @@ class RecipeForm extends Component {
                   ))}
                 </ol>
               </div>
-              <div className='directions-textarea'>
-                <textarea
-                  type="text"
-                  name="direction"
-                  rows={15}
-                  value={this.state.direction}
-                  placeholder='Add Direction'
-                  onChange={this.handleChange}
-                />
-                <FontAwesomeIcon onClick={this.handleDirectionAddition} icon="circle-plus" />
+              <div className='directions-section'>
+                <div className='error-message'>
+                  {this.state.directionsError && <p><FontAwesomeIcon icon="circle-exclamation" /> {this.state.directionsError}</p>}
+                </div>
+                <div className='directions-textarea'>
+                  <textarea
+                    type="text"
+                    name="direction"
+                    rows={15}
+                    value={this.state.direction}
+                    placeholder='Add Direction'
+                    onChange={this.handleChange}
+                  />
+                  <FontAwesomeIcon onClick={this.handleDirectionAddition} icon="circle-plus" />
+                </div>
               </div>
             </div>
             <input required
@@ -417,13 +481,19 @@ class RecipeForm extends Component {
               placeholder='Preparation time'
               onChange={this.handleChange}
             />
-            <input required
-              type="text"
-              name="servings"
-              value={this.state.servings}
-              placeholder='Servings'
-              onChange={this.handleChange}
-            />
+        
+            <div className='servings-section'>
+              <div className='error-message'>
+                  {this.state.servingsError && <p><FontAwesomeIcon icon="circle-exclamation" /> {this.state.servingsError}</p>}
+              </div>
+              <input required
+                type="text"
+                name="servings"
+                value={this.state.servings}
+                placeholder='Servings'
+                onChange={this.handleChange}
+              />
+            </div>
             <select
               onChange={this.handleChange}
               name='cat_name'
@@ -468,27 +538,32 @@ class RecipeForm extends Component {
               </option>
             </select>
             
-            <div className="image-uploaders">
-              {this.state.img_url && this.state.editMode ? (
-                <div className='recipe-manager-image-wrapper'>
-                  <img src={`http://localhost:5000/images/${this.state.img_url}`} />
+            <div className='image-section'>
+              <div className='error-message'>
+                    {this.state.imgError && <p><FontAwesomeIcon icon="circle-exclamation" /> {this.state.imgError}</p>}
+              </div>
+              <div className="image-uploaders">
+                {this.state.img_url && this.state.editMode ? (
+                  <div className='recipe-manager-image-wrapper'>
+                    <img src={`http://localhost:5000/images/${this.state.img_url}`} />
 
-                  <div className='image-removal-link'>
-                    <a onClick={() => this.deleteImage()}>
-                      <FontAwesomeIcon icon="trash-can" />
-                    </a>
+                    <div className='image-removal-link'>
+                      <a onClick={() => this.deleteImage()}>
+                        <FontAwesomeIcon icon="trash-can" />
+                      </a>
+                    </div>
                   </div>
-                </div>
-              ):(
-                <DropzoneComponent
-                  ref={this.imageRef}
-                  config={this.componentConfig()}
-                  djsConfig={this.djsConfig()}
-                  eventHandlers={this.handleImageDrop()}
-                >
-                  <div className='dz-message'>Featured image</div>
-                </DropzoneComponent>
-              )}
+                ):(
+                  <DropzoneComponent
+                    ref={this.imageRef}
+                    config={this.componentConfig()}
+                    djsConfig={this.djsConfig()}
+                    eventHandlers={this.handleImageDrop()}
+                  >
+                    <div className='dz-message'>Featured image</div>
+                  </DropzoneComponent>
+                )}
+              </div>
             </div>
             <div className='publish-option'>
               <div className='publish'>

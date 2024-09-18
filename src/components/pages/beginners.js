@@ -41,7 +41,6 @@ export default class Beginners extends Component {
   componentDidMount() {
     axios.get(`http://localhost:5000/recipes?beginners=true`)
       .then(response => {
-        console.log(response.data)
         this.setState({
           recipes: response.data
         })
@@ -63,8 +62,7 @@ export default class Beginners extends Component {
             {
               this.state.recipes.length > 0 ?
               <Carousel recipes={this.state.recipes} /> : null
-            }
-            
+            }   
         </div>
         <Footer />
       </div>

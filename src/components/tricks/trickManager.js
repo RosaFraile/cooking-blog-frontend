@@ -8,6 +8,7 @@ import Navbar from '../navigation/navbar';
 import Footer from '../footer/footer';
 import TrickSidebarList from '../tricks/trickSidebarList'
 import TrickForm from './trickForm';
+import MessageModal from '../modals/messageModal';
 
 class TrickManager extends Component {
   constructor(props) {
@@ -15,7 +16,9 @@ class TrickManager extends Component {
 
     this.state = {
       trickItems: [],
-      trickToEdit: {}
+      trickToEdit: {},
+      msgModalIsOpen: false,
+      message: ""
     };
 
     this.handleSuccessfulFormSubmission = this.handleSuccessfulFormSubmission.bind(this);
@@ -24,6 +27,21 @@ class TrickManager extends Component {
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
     this.handleEditClick = this.handleEditClick.bind(this);
     this.clearTrickToEdit = this.clearTrickToEdit.bind(this);
+    this.handleModalClose = this.handleModalClose.bind(this);
+    this.handleError = this.handleError.bind(this);
+  }
+
+  handleModalClose() {
+    this.setState({
+      msgModalIsOpen: false
+    })
+  }
+
+  handleError(errorMessage) {
+    this.setState({
+      msgModalIsOpen: true,
+      message: errorMessage
+    })
   }
 
   clearTrickToEdit() {
@@ -44,7 +62,7 @@ class TrickManager extends Component {
         })
         return response.data;
       }).catch(error => {
-        console.log("handleDeleteClick error", error);
+        this.handleError(`Error deleting the cooking trick from the Database - ${error}`);
       })
   }
 
@@ -67,7 +85,7 @@ class TrickManager extends Component {
   }
 
   handleFormSubmissionError(error) {
-    console.log("Error in handleFormSubmissionError", error)
+    this.handleError(`An error occurred during the form submission - ${error}`);
   }
 
   getTrickItems() {
@@ -79,7 +97,7 @@ class TrickManager extends Component {
         })
       })
       .catch(error => {
-        console.log("Error in getTrickItems", error);
+        this.handleError(`Error getting the cooking tricks from the Database - ${error}`);
       });
   }
 
@@ -90,6 +108,11 @@ class TrickManager extends Component {
   render() {
     return (
       <div>
+        <MessageModal
+          modalIsOpen={this.state.msgModalIsOpen}
+          message={this.state.message} 
+          handleModalClose={this.handleModalClose}
+        />
         <Navbar />
         <div className='trick-manager-wrapper'>
           <div className='left-column'>

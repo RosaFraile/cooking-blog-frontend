@@ -29,59 +29,94 @@
                     }
                 }
 
-                .ingredient {
+                .ingredient-section {
                     display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    gap: 5px;
+                    flex-direction: column;
 
-                    input {
-                        flex: auto;
-                    }
-                }
-            }
-
-            .directions-group {
-                .directions-textarea {
-                    margin-top: 10px;
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                    
-                    textarea {
-                        width: 100%;
-                        box-sizing: border-box;
-                    }
-                }  
-            }
-            
-            .image-uploaders {
-                display: grid;
-                grid-gap: 21px;
-                grid-template-columns: 200px;
-
-                .recipe-manager-image-wrapper,
-                .image-upload-wrapper {
-                    img {
-                        width: 100%;
-                        height: 120px;
-                        object-fit: cover;
-                        border-radius: 5px;
+                    .error-message {
+                        @include form-error-message();
                     }
 
-                    .image-removal-link {
+                    .ingredient {
                         display: flex;
-                        justify-content: center;
-                        
-                        a {
-                            font-weight: 700;
-                            color: $warning;
-                            cursor: pointer;
+                        align-items: center;
+                        justify-content: space-between;
+                        gap: 5px;
+    
+                        input {
+                            flex: auto;
                         }
                     }
                 }
             }
 
+            .directions-group {
+                .directions-section {
+                    display: flex;
+                    flex-direction: column;
+
+                    .error-message {
+                        @include form-error-message();
+                    }
+
+                    .directions-textarea {
+                        margin-top: 10px;
+                        display: flex;
+                        align-items: center;
+                        gap: 5px;
+                        
+                        textarea {
+                            width: 100%;
+                            box-sizing: border-box;
+                        }
+                    }  
+                }
+
+            }
+
+            .servings-section {
+                display: flex;
+                flex-direction: column;
+
+                .error-message {
+                    @include form-error-message();
+                }
+            }
+            
+            .image-section {
+                .error-message {
+                    @include form-error-message();
+                    text-align: start;
+                }
+
+                .image-uploaders {
+                    display: grid;
+                    grid-gap: 21px;
+                    grid-template-columns: 200px;
+    
+                    .recipe-manager-image-wrapper,
+                    .image-upload-wrapper {
+                        img {
+                            width: 100%;
+                            height: 120px;
+                            object-fit: cover;
+                            border-radius: 5px;
+                        }
+    
+                        .image-removal-link {
+                            display: flex;
+                            justify-content: center;
+                            
+                            a {
+                                font-weight: 700;
+                                color: $warning;
+                                cursor: pointer;
+                            }
+                        }
+                    }
+                }
+            }
+            
             .publish-option {
                 display: flex;
                 flex-direction: column;

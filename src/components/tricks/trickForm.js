@@ -35,22 +35,9 @@ class TrickForm extends Component {
     })
   }
 
-
-/*
-  handleSuccessfulFormSubmission(data) {
-    axios.get(`http://localhost:5000/tricks?user=${this.props.currentUser.users_id}`)
-      .then(response => {
-        this.props.history.push("/tricks");
-      }).catch(error => {
-          console.log("handleSuccessfulFormSubmission error", error)
-      })
-  }
-*/
-
   componentDidMount() {
     // Edit mode from Tricks page
     if (this.props.editMode) {
-      console.log(this.props.trickToEdit)
       this.setState({
         id: this.props.trickToEdit.tricks_id,
         title: this.props.trickToEdit.tricks_title,
@@ -93,7 +80,6 @@ class TrickForm extends Component {
   }
 
   handleSubmit(event) {
-    console.log(this.state)
     if(this.state.publish_status === "published") {
       this.state.published_on = moment().format('YYYY-MM-DD HH:mm:ss');
     } else {
@@ -121,12 +107,22 @@ class TrickForm extends Component {
         else if (this.state.editMode) {
           this.props.handleEditFormSubmission()
         } else {
-          console.log(response.data[0])
           this.props.handleSuccessfulFormSubmission(response.data[0]);
         }
       })
       .catch(error => {
-        console.log("handleSubmit for write trick error", error);
+        if (error.response) {
+          switch (error.response.status) {
+            case 401:
+            case 403:
+              this.handleError("Authentication error. Is recommended to logout and login again.");
+              break;
+            default:
+              his.handleError("An error occurred while accessing the DataBase");
+          }
+        } else {
+            this.handleError("An error occurred while accessing the DataBase");
+        }
       });
 
     event.preventDefault();

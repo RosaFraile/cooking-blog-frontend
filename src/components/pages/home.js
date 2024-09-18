@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import Navbar from '../navigation/navbar';
 import Footer from '../footer/footer';
@@ -96,6 +97,9 @@ export default class Home extends Component {
         <Navbar />
         <div className='home-wrapper'>
           <div className='home'>
+            <div className='categories-title'>
+              <h5>RECIPES <span><FontAwesomeIcon icon="chevron-right" /></span> {this.state.category}</h5>
+            </div>
             <div className='categories'>
               <button
                 onClick={()=> {
@@ -115,9 +119,7 @@ export default class Home extends Component {
                   </button> 
               ))}
             </div>
-            <div className='categories-title'>
-              <h1>{this.state.category}</h1>
-            </div>
+            
             <div className='recipes'>
               {this.state.recipes.map(recipe => (
                 <RecipeItem recipeItem={recipe} key={recipe.recipes_id} />

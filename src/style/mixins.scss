@@ -75,3 +75,9 @@
     font-size: 1.5em;
     transition: 0.5s ease-in-out;
 }
+
+@mixin form-error-message {
+    color: $warning;
+    text-align: end;
+    font-size: 0.8em;
+}

@@ -13,7 +13,8 @@ import {
   faChevronDown,
   faChevronUp,
   faChevronLeft,
-  faChevronRight
+  faChevronRight,
+  faCircleExclamation
 } from "@fortawesome/free-solid-svg-icons";
 
 const Icons = () => {
@@ -31,7 +32,8 @@ const Icons = () => {
       faChevronDown,
       faChevronUp,
       faChevronLeft,
-      faChevronRight
+      faChevronRight,
+      faCircleExclamation
     );
 };
 

@@ -28,7 +28,6 @@ export default function(state=INIT_STATE, action) {
                 errorText: action.payload
             }
         case CLEAR_FAILURE:
-            console.log("Clear failure", action.payload)
             return {
                 ...state,
                 errorText: action.payload

@@ -50,9 +50,16 @@
 
             .categories-title {
                 text-transform: uppercase;
-                font-weight: 900;
+                font-weight: 700;
                 text-align: center;
-                margin-top: 30px;
+             //   margin-top: 10px;
+                margin-bottom: 20px;
+
+                h5 span {
+                    font-size: 0.8em;
+                    margin-left: 5px;
+                    margin-right: 5px;
+                }
             }
 
             .recipes {
