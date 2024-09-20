@@ -24,6 +24,7 @@ class RecipeForm extends Component {
       servings: "",
       img: "",
       img_url: "",
+      img_to_delete: "",
       difficulty: "easy",
       published_on: moment("1970-01-01").format('YYYY-MM-DD HH:mm:ss'),
       publish_status: "draft",
@@ -57,7 +58,8 @@ class RecipeForm extends Component {
     this.imageRef = React.createRef();
     
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.deleteImage = this.deleteImage.bind(this);
+    this.handleDeleteImageUrl = this.handleDeleteImageUrl.bind(this);
+    this.handleDeleteImage = this.handleDeleteImage.bind(this);
 
     this.handleModalClose = this.handleModalClose.bind(this);
     this.handleError = this.handleError.bind(this);
@@ -92,13 +94,21 @@ class RecipeForm extends Component {
       })
   }
 
-  deleteImage() {
+  handleDeleteImageUrl() {
+    const img_to_delete = this.state.img_url;
+    this.setState({
+      img_url: "",
+      img_to_delete
+    })
+  }
+
+  handleDeleteImage() {
     axios
-      .delete(`http://localhost:5000/recipes/delete-recipe-image/${this.state.img_url}`,
+      .delete(`http://localhost:5000/recipes/delete-recipe-image/${this.state.img_to_delete}`,
       { withCredentials: true }
     ).then(response => {
       this.setState({
-        img_url: ""
+        img_to_delete: ""
       })
     }). catch(error => {
       this.handleError(`Error deleting the image - ${error}`);
@@ -112,11 +122,12 @@ class RecipeForm extends Component {
   }
 
   handleIngredientAddition() {
-    const ingredient = this.state.ingredient;
-    this.setState({
-      ingredientsList: this.state.ingredientsList.concat(ingredient),
-      ingredient: ""
-    })
+    if (this.state.ingredient) {
+      this.setState({
+        ingredientsList: this.state.ingredientsList.concat(this.state.ingredient),
+        ingredient: ""
+      })
+    }
   }
 
   handleDeleteIngredient(indice) {
@@ -128,11 +139,12 @@ class RecipeForm extends Component {
   }
 
   handleDirectionAddition() {
-    const direction = this.state.direction;
-    this.setState({
-      directionsList: this.state.directionsList.concat(direction),
-      direction: ""
-    })
+    if (this.state.direction) {
+      this.setState({
+        directionsList: this.state.directionsList.concat(this.state.direction),
+        direction: ""
+      })
+    }
   }
 
   handleDeleteDirection(indice) {
@@ -301,6 +313,10 @@ class RecipeForm extends Component {
         this.setState({
           ingredientsError: "At least one ingredient is needed"
         })
+      } else if (this.state.ingredientsList.length > 1000) {
+        this.setState({
+          ingredientsError: "Too long!!! (up to 1000 caracters)"
+        })
       } else {
         this.setState({
           ingredientsError: ""
@@ -310,6 +326,10 @@ class RecipeForm extends Component {
       if (this.state.directionsList.length === 0) {
         this.setState({
           directionsError: "At least one direction is needed"
+        })
+      } else if (this.state.directionsList.length > 1000) {
+        this.setState({
+          directionsError: "Too long!!! (up to 5000 caracters)"
         })
       } else {
         this.setState({
@@ -336,6 +356,9 @@ class RecipeForm extends Component {
         },
         withCredentials: true
       }).then(response => {
+        if (this.state.apiAction === "patch" && this.state.img_to_delete) {
+          this.handleDeleteImage();
+        }
         
         if (this.state.img) {
           this.imageRef.current.dropzone.removeAllFiles();
@@ -349,10 +372,11 @@ class RecipeForm extends Component {
           servings: "",
           img: "",
           img_url: "",
+          img_to_delete: "",
           difficulty: "easy",
           published_on: moment("1970-01-01").format('YYYY-MM-DD HH:mm:ss'),
           publish_status: "draft",
-          cat_name: "",
+          cat_name: this.state.categories[0],
           user_id: this.props.currentUser.users_id,
           ingredientsList: [],
           ingredient: "",
@@ -375,6 +399,7 @@ class RecipeForm extends Component {
         }
       })
       .catch(error => {
+        console.log("Error de respuesta en submit", error)
         if (error.response) {
           switch (error.response.status) {
             case 401:
@@ -413,6 +438,79 @@ class RecipeForm extends Component {
               placeholder='Title'
               onChange={this.handleChange}
             />
+
+            <input required
+              type="text"
+              name="prep_time"
+              value={this.state.prep_time}
+              placeholder='Preparation time'
+              onChange={this.handleChange}
+            />
+        
+            <div className='servings-section'>
+              <div className='error-message'>
+                  {this.state.servingsError && <p><FontAwesomeIcon icon="circle-exclamation" /> {this.state.servingsError}</p>}
+              </div>
+              <input required
+                type="text"
+                name="servings"
+                value={this.state.servings}
+                placeholder='Servings'
+                onChange={this.handleChange}
+              />
+            </div>
+
+            <div className='category-section'>
+              <h3>Category</h3>
+              <select
+                onChange={this.handleChange}
+                name='cat_name'
+                value={this.state.cat_name}
+                className='select-element'
+              >
+              {
+                this.state.categories.map(category => (
+                  <option
+                    key={category.categories_id}
+                    className="select-option"
+                    value={category.categories_name}
+                  >
+                    {category.categories_name}
+                  </option>
+                ))
+              }
+              </select>
+            </div>
+
+            <div className='difficulty-section'>
+              <h3>Difficulty</h3>
+              <select
+                onChange={this.handleChange}
+                name='difficulty'
+                value={this.state.difficulty}
+                className='select-element'
+              >
+                <option
+                  className="select-option"
+                  value="easy"
+                >
+                  EASY
+                </option>
+                <option
+                  className="select-option"
+                  value="medium"
+                >
+                  MEDIUM
+                </option>
+                <option
+                  className="select-option"
+                  value="hard"
+                >
+                  HARD
+                </option>
+              </select>
+            </div>
+
             <div className='ingredients-group'>
               <div className='ingredients-list'>
                 <h3>Ingredients</h3>
@@ -439,10 +537,13 @@ class RecipeForm extends Component {
                     placeholder='Add Ingredient'
                     onChange={this.handleChange}
                   />
-                  <FontAwesomeIcon onClick={this.handleIngredientAddition} icon="circle-plus" />
+                  <span>
+                    <FontAwesomeIcon onClick={this.handleIngredientAddition} icon="circle-plus" />
+                  </span>
                 </div> 
               </div>
             </div>
+
             <div className='directions-group'>
               <div className='directions-list'>
                 <h3>Directions</h3>
@@ -451,7 +552,9 @@ class RecipeForm extends Component {
                     <div key={idx}>
                       <li>{direction}
                         <span className="delete-option" onClick={(event) => {
-                          this.handleDeleteDirection(idx)}}><FontAwesomeIcon icon="circle-minus" /></span>
+                          this.handleDeleteDirection(idx)}}>
+                          <FontAwesomeIcon icon="circle-minus" />
+                        </span>
                       </li>
                     </div>   
                   ))}
@@ -470,74 +573,13 @@ class RecipeForm extends Component {
                     placeholder='Add Direction'
                     onChange={this.handleChange}
                   />
-                  <FontAwesomeIcon onClick={this.handleDirectionAddition} icon="circle-plus" />
+                  <div className='add-direction'>
+                    <FontAwesomeIcon onClick={this.handleDirectionAddition} icon="circle-plus" />
+                  </div>
                 </div>
               </div>
             </div>
-            <input required
-              type="text"
-              name="prep_time"
-              value={this.state.prep_time}
-              placeholder='Preparation time'
-              onChange={this.handleChange}
-            />
-        
-            <div className='servings-section'>
-              <div className='error-message'>
-                  {this.state.servingsError && <p><FontAwesomeIcon icon="circle-exclamation" /> {this.state.servingsError}</p>}
-              </div>
-              <input required
-                type="text"
-                name="servings"
-                value={this.state.servings}
-                placeholder='Servings'
-                onChange={this.handleChange}
-              />
-            </div>
-            <select
-              onChange={this.handleChange}
-              name='cat_name'
-              value={this.state.cat_name}
-              className='select-element'
-            >
-            {
-              this.state.categories.map(category => (
-                <option
-                  key={category.categories_id}
-                  className="select-option"
-                  value={category.categories_name}
-                >
-                  {category.categories_name}
-                </option>
-              ))
-            }
-            </select>
-            <select
-              onChange={this.handleChange}
-              name='difficulty'
-              value={this.state.difficulty}
-              className='select-element'
-            >
-              <option
-                className="select-option"
-                value="easy"
-              >
-                Easy
-              </option>
-              <option
-                className="select-option"
-                value="medium"
-              >
-                Medium
-              </option>
-              <option
-                className="select-option"
-                value="hard"
-              >
-                Hard
-              </option>
-            </select>
-            
+ 
             <div className='image-section'>
               <div className='error-message'>
                     {this.state.imgError && <p><FontAwesomeIcon icon="circle-exclamation" /> {this.state.imgError}</p>}
@@ -548,7 +590,7 @@ class RecipeForm extends Component {
                     <img src={`http://localhost:5000/images/${this.state.img_url}`} />
 
                     <div className='image-removal-link'>
-                      <a onClick={() => this.deleteImage()}>
+                      <a onClick={() => this.handleDeleteImageUrl()}>
                         <FontAwesomeIcon icon="trash-can" />
                       </a>
                     </div>
