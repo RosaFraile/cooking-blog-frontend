@@ -5,6 +5,8 @@
   "scripts": {
     "preinstall": "npm set audit false",
     "start": "webpack-dev-server --config webpack/dev.config.js --watch",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "build": "cross-env NODE_ENV=production webpack --config webpack/prod.config.js --progress --display-error-details --color",
     "heroku-postbuild": "npm run build",
     "precommit": "eslint src",
@@ -25,12 +27,14 @@
     "sass",
     "css module"
   ],
-  "author": "Your Name Here",
+  "author": "Rosa Fraile",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/bottega-code-school/js-builder/issues"
   },
-  "homepage": "https://github.com/bottega-code-school/js-builder",
+
+  "homepage": "http://RosaFraile.github.io/cooking-blog-frontend",
+  
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
